@@ -7,8 +7,8 @@
 #include "string.h"
 
 
-static uint32_t SpeedValue_left = 600;
-static uint32_t SpeedValue_right = 600;
+static uint32_t SpeedValue_left = 128;
+static uint32_t SpeedValue_right = 128;
 struct receive_cmd_list * receive_cmd_type;
 
 void receive_task(){
@@ -17,8 +17,8 @@ void receive_task(){
 	//while(1){
 		if(Receive_String_Ready){
 			if(received_string[0] == '+'){
-				SpeedValue_left += 5;
-				SpeedValue_right += 5;
+				SpeedValue_left += 1;
+				SpeedValue_right += 1;
 				testMotor(SpeedValue_left,SpeedValue_right);
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);
@@ -26,8 +26,8 @@ void receive_task(){
 				USART_putd(USART3, SpeedValue_right);
 				USART_puts(USART3, "\r\n");
 			}else if(received_string[0] == '-'){
-				SpeedValue_left -= 5;
-				SpeedValue_right -= 5;
+				SpeedValue_left -= 1;
+				SpeedValue_right -= 1;
 				testMotor(SpeedValue_left,SpeedValue_right);
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);

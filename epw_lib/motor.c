@@ -66,8 +66,8 @@ void init_motor(void){
 
 	/* Time base configuration*/
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructure.TIM_Period = 1200 - 1;
-	TIM_TimeBaseStructure.TIM_Prescaler = 7 - 1;
+	TIM_TimeBaseStructure.TIM_Period = 256 - 1;
+	TIM_TimeBaseStructure.TIM_Prescaler = 250 - 1;
 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
@@ -76,7 +76,7 @@ void init_motor(void){
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-	TIM_OCInitStructure.TIM_Pulse = 600;//in this case(duty cycle:50%)
+	TIM_OCInitStructure.TIM_Pulse = 128;//in this case(duty cycle:50%)
 	//PWM1 Mode Configuration: TIM4 Channel3 (MOTOR_LEFT_PWM_PIN)
 	TIM_OC3Init(TIM4, &TIM_OCInitStructure);
 	TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
