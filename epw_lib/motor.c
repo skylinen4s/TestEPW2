@@ -8,9 +8,9 @@
 #include "motor.h"
 #include "uart.h"
 
-#define TimPeriod 1200
-#define TimPrescaler 7
-#define SpeedValue 600 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
+#define TimPeriod 256
+#define TimPrescaler 32
+#define SpeedValue 124 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 

@@ -9,7 +9,7 @@
 
 extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
-uint32_t inc = 5;
+uint32_t inc = 1;
 
 struct receive_cmd_list * receive_cmd_type;
 
