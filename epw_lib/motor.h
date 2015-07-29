@@ -7,10 +7,6 @@
 #define MOTOR_LEFT_PWM_PIN			GPIO_Pin_14 //Red  TIM4_CH3
 #define MOTOR_RIGHT_PWM_PIN			GPIO_Pin_15 //Blue TIM4_CH4
 
-extern uint32_t TimPeriod;
-extern uint32_t TimPerscaler;
-extern uint32_t SpeedValue;
-
 extern void init_motor(void);
 extern void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
 
