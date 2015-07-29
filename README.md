@@ -4,6 +4,12 @@ A demo project of FreeRTOS running on a STM32F4 Discovery board.
 
 ## Steps to run this example
 
+first , you have to add two directories named "binary" and "build".
+$mkdir binary
+$mkdir build
+
+then, change the compiler path in Makefile to match the path of your own compiler
+
 ### Prerequisite
 
 1. A PC running Linux or Windows with Cygwin(not tested). A Mac is also fine with this example.
