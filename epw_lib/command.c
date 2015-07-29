@@ -3,22 +3,23 @@
 #include "stm32f4xx_usart.h"
 #include "uart.h"
 #include "command.h"
+#include "motor.h"
 /*parse*/
 #include "string.h"
 
+extern uint32_t SpeedValue_left;
+extern uint32_t SpeedValue_right;
+uint32_t inc = 5;
 
-static uint32_t SpeedValue_left = 128;
-static uint32_t SpeedValue_right = 128;
 struct receive_cmd_list * receive_cmd_type;
 
 void receive_task(){
 	//int i, j;
-	
 	//while(1){
 		if(Receive_String_Ready){
 			if(received_string[0] == '+'){
-				SpeedValue_left += 1;
-				SpeedValue_right += 1;
+				SpeedValue_left += inc;
+				SpeedValue_right += inc;
 				testMotor(SpeedValue_left,SpeedValue_right);
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);
@@ -26,8 +27,8 @@ void receive_task(){
 				USART_putd(USART3, SpeedValue_right);
 				USART_puts(USART3, "\r\n");
 			}else if(received_string[0] == '-'){
-				SpeedValue_left -= 1;
-				SpeedValue_right -= 1;
+				SpeedValue_left -= inc;
+				SpeedValue_right -= inc;
 				testMotor(SpeedValue_left,SpeedValue_right);
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);
