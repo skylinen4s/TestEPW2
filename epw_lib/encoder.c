@@ -10,7 +10,7 @@ void init_encoder(void){
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
 	GPIO_InitStruct.GPIO_Pin = ENCODER_LEFT_A_PIN | ENCODER_RIGHT_A_PIN
-							 | ENCODER_LEFT_B_PIN | ENCODER_RIGHT_B_PIN;
+				 | ENCODER_LEFT_B_PIN | ENCODER_RIGHT_B_PIN;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
