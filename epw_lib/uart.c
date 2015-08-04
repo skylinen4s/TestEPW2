@@ -188,6 +188,9 @@ void USART_putd(USART_TypeDef* USARTx, uint32_t number)
 		tmp_num[cnt] = temp+'0';
 		cnt++;
 	}
+	if(number == 0){
+		tmp_num[cnt++] = '0';
+	}
 	int j = 0;
 	while(cnt){
 		num[j++] = tmp_num[--cnt];
