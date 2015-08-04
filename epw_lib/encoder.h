@@ -18,4 +18,5 @@ void EXTI0_IRQHandler();
 void EXTI1_IRQHandler();
 void detachEXTI(uint32_t EXTI_LineX);
 void attachEXTI(uint32_t EXTI_LineX);
+void getEncoder(void);
 #endif /* __ENCODER_H__ */

@@ -78,3 +78,21 @@ void attachEXTI(uint32_t EXTI_LineX){
 	EXTI_InitStruct.EXTI_Line = EXTI_LineX;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 }
+
+void getEncoder(void){
+	detachEXTI(EXTI_Line0);
+	detachEXTI(EXTI_Line1);
+
+	USART_puts(USART3, "le_en:");
+	USART_putd(USART3, encoder_left_counter);
+	USART_puts(USART3, " ri_en:");
+	USART_putd(USART3, encoder_right_counter);
+	USART_puts(USART3, "\r\n");
+
+	/* clear encoder counter*/
+	encoder_left_counter = 0;
+	encoder_right_counter = 0;
+
+	attachEXTI(EXTI_Line0);
+	attachEXTI(EXTI_Line1);
+}
