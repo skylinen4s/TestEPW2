@@ -61,6 +61,7 @@ SRC+=servo_motor.c
 SRC+=uart.c
 SRC+=command.c
 SRC+=motor.c
+SRC+=encoder.c
 #----------------------
 
 # FreeRTOS Source Files
