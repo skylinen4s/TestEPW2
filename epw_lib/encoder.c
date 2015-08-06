@@ -14,7 +14,7 @@ void init_encoder(void){
 				 | ENCODER_LEFT_B_PIN | ENCODER_RIGHT_B_PIN;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_Init(ENCODER_PORT, &GPIO_InitStruct);
 }
 

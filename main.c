@@ -53,6 +53,8 @@ void initialize()
     USART_puts(USART3,"motor is ready \n\r");
     /* Enable USART interrupt */
     //USART3_Interrupt();
+    init_encoder();
+    init_encoder_exti();
 }
 
 int main(void)
