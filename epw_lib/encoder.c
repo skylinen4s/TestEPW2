@@ -9,6 +9,7 @@ void init_encoder(void){
 	//Enable GPIO clock
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
+	GPIO_StructInit(&GPIO_InitStruct);
 	GPIO_InitStruct.GPIO_Pin = ENCODER_LEFT_A_PIN | ENCODER_RIGHT_A_PIN
 				 | ENCODER_LEFT_B_PIN | ENCODER_RIGHT_B_PIN;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
@@ -46,7 +47,7 @@ void init_encoder_exti(void){
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
 	EXTI_ClearITPendingBit(EXTI_Line1);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI0_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
