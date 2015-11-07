@@ -17,7 +17,10 @@ typedef enum{
                 }
                 actuator_state_t;
 static actuator_state_t actuator_state_A, actuator_state_B;
-static actuator_A_CW = 0, actuator_A_CCW = 0, actuator_B_CW = 0, actuator_B_CCW = 0; // limit moving time of linear actuator.20150528
+static actuator_A_cnt = 0, actuator_B_cnt = 0; 
+/* limit moving time of linear actuator.
+ * this value * the value of "DETECT_LS_POLLING_PERIOD" = working period of Linear Actuator 20151107 
+ */
 
 /*Timer handle declare for detect the LS state*/
 xTimerHandle detect_LS_Timers;
@@ -172,27 +175,27 @@ static void detect_LS_Polling(){
         case ACTUATOR_STATE_IDLE:
            break;//wait the next state into.
         case ACTUATOR_STATE_MOVE_CW:
-           actuator_A_CW ++;
+           actuator_A_cnt ++;
            if(get_Linear_Actuator_A_LS_State()==0x01 || get_Linear_Actuator_A_LS_State()==0x03){
                set_linearActuator_A_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_A=ACTUATOR_STATE_IDLE;
            }
-           if(actuator_A_CW >= 20){
+           if(actuator_A_cnt >= 20){
                set_linearActuator_A_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_A=ACTUATOR_STATE_IDLE;
-               actuator_A_CW = 0;
+               actuator_A_cnt = 0;
            }
            break;
         case ACTUATOR_STATE_MOVE_CCW:
-            actuator_A_CCW ++;
+            actuator_A_cnt ++;
             if(get_Linear_Actuator_A_LS_State()==0x02 || get_Linear_Actuator_A_LS_State()==0x03){
                set_linearActuator_A_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_A=ACTUATOR_STATE_IDLE;
             }
-            if(actuator_A_CCW >= 20){
+            if(actuator_A_cnt >= 20){
                set_linearActuator_A_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_A=ACTUATOR_STATE_IDLE;
-               actuator_A_CCW = 0;
+               actuator_A_cnt = 0;
             }
            break;
         default:
@@ -204,27 +207,27 @@ static void detect_LS_Polling(){
        case ACTUATOR_STATE_IDLE:
            break;//wait the next command into.
        case ACTUATOR_STATE_MOVE_CW:
-           actuator_B_CW ++;
+           actuator_B_cnt ++;
            if(get_Linear_Actuator_B_LS_State()==0x01 || get_Linear_Actuator_B_LS_State()==0x03){
                set_linearActuator_B_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_B=ACTUATOR_STATE_IDLE;
            }
-           if(actuator_B_CW >= 20){
+           if(actuator_B_cnt >= 20){
                set_linearActuator_B_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_B=ACTUATOR_STATE_IDLE;
-               actuator_B_CW = 0;
+               actuator_B_cnt = 0;
            }
            break;
        case ACTUATOR_STATE_MOVE_CCW:
-           actuator_B_CCW ++;
+           actuator_B_cnt ++;
            if(get_Linear_Actuator_B_LS_State()==0x02 || get_Linear_Actuator_B_LS_State()==0x03){
                set_linearActuator_B_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_B=ACTUATOR_STATE_IDLE;
            }
-           if(actuator_B_CCW >= 20){
+           if(actuator_B_cnt >= 20){
                set_linearActuator_B_cmd(LINEAR_ACTU_STOP,0);
                actuator_state_B=ACTUATOR_STATE_IDLE;
-               actuator_B_CCW = 0;
+               actuator_B_cnt = 0;
            }
            break;
        default: 
