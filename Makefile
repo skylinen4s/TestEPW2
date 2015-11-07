@@ -1,6 +1,6 @@
 TARGET:=FreeRTOS
 # TODO change to your ARM gcc toolchain path
-TOOLCHAIN_ROOT:=~/epw/gcc-arm-none-eabi-4_7-2013q3
+TOOLCHAIN_ROOT:=/usr/local/gcc-arm-none-eabi-4_7-2013q3
 TOOLCHAIN_PATH:=$(TOOLCHAIN_ROOT)/bin
 TOOLCHAIN_PREFIX:=arm-none-eabi
 
@@ -62,6 +62,7 @@ SRC+=uart.c
 SRC+=command.c
 SRC+=motor.c
 SRC+=encoder.c
+SRC+=linear_actuator.c
 #----------------------
 
 # FreeRTOS Source Files
