@@ -75,17 +75,17 @@ void set_linearActuator_A_cmd(int flag){
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN1_PIN,Bit_RESET);/* 0 */
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN2_PIN,Bit_RESET);/* 0 */
          actuator_state_A = ACTUATOR_STATE_IDLE;
-     }
+     }/* STOP */
      else if(flag==LINEAR_ACTU_CW && get_Linear_Actuator_A_LS_State()!=0x01 && get_Linear_Actuator_A_LS_State()!=0x03){ /*if not upper limited.*/
-         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN1_PIN,Bit_RESET);/* 0 */
-         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN2_PIN,Bit_SET);/* 1 */
-         actuator_state_A = ACTUATOR_STATE_MOVE_CW;
-     }
-     else if(flag==LINEAR_ACTU_CCW && get_Linear_Actuator_A_LS_State()!=0x02 && get_Linear_Actuator_A_LS_State()!=0x03){ /*if not lower limited*/
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN1_PIN,Bit_SET);/* 1 */
-    	 GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN2_PIN,Bit_RESET);/* 0 */ 
+         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN2_PIN,Bit_RESET);/* 0 */
+         actuator_state_A = ACTUATOR_STATE_MOVE_CW;
+     }/* FORWARD */
+     else if(flag==LINEAR_ACTU_CCW && get_Linear_Actuator_A_LS_State()!=0x02 && get_Linear_Actuator_A_LS_State()!=0x03){ /*if not lower limited*/
+         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN1_PIN,Bit_RESET);/* 0 */
+	 GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN2_PIN,Bit_SET);/* 1 */
          actuator_state_A = ACTUATOR_STATE_MOVE_CCW;
-     }
+     }/* BACKWARD */
 }
 
 void set_linearActuator_B_cmd(int flag){
@@ -93,17 +93,17 @@ void set_linearActuator_B_cmd(int flag){
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN3_PIN,Bit_RESET);/* 0 */
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN4_PIN,Bit_RESET);/* 0 */
          actuator_state_B = ACTUATOR_STATE_IDLE;
-     }
+     }/* STOP */
      else if(flag==LINEAR_ACTU_CW && get_Linear_Actuator_B_LS_State()!=0x01 && get_Linear_Actuator_B_LS_State()!=0x03){ /*if not upper limited.*/
+         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN3_PIN,Bit_SET);/* 1 */
+         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN4_PIN,Bit_RESET);/* 0 */
+         actuator_state_B = ACTUATOR_STATE_MOVE_CW;
+     }/* FORWARD */
+     else if(flag==LINEAR_ACTU_CCW && get_Linear_Actuator_B_LS_State()!=0x02 && get_Linear_Actuator_B_LS_State()!=0x03){ /*if not lower limited*/
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN3_PIN,Bit_RESET);/* 0 */
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN4_PIN,Bit_SET);/* 1 */
-         actuator_state_B = ACTUATOR_STATE_MOVE_CW;
-     }
-     else if(flag==LINEAR_ACTU_CCW && get_Linear_Actuator_B_LS_State()!=0x02 && get_Linear_Actuator_B_LS_State()!=0x03){ /*if not lower limited*/
-         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN3_PIN,Bit_SET);/* 1 */
-         GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN4_PIN,Bit_RESET);/* 0 */ 
          actuator_state_B = ACTUATOR_STATE_MOVE_CCW;
-     }
+     }/* BACKWARD */
 }
 
 static void detect_LS_Polling(){    
