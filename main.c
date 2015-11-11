@@ -10,7 +10,7 @@
 #include "uart.h"
 #include "motor.h"
 //#include "transfer.h"
-
+#include "linear_actuator.h"
 
 void init_UserButton(void);
 void init_LED(void);
@@ -55,6 +55,7 @@ void initialize()
     //USART3_Interrupt();
     init_encoder();
     init_encoder_exti();
+    init_linear_actuator();
 }
 
 int main(void)
