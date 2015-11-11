@@ -38,24 +38,24 @@ void receive_task(){
 				USART_puts(USART3, "\r\n");
 			}else if(received_string[0] == 'e'){
 				getEncoder();
-			}else if(received_string[0] == 'u')
-				if(received_string[1] == 'A'){
+			}else if(received_string[0] == 'u'){
+				if(received_string[1] == 'a'){
 				    USART_puts(USART3, "Actu_A_up");
-				    set_linearActuator_A_cmd(LINEAR_ACTU_CW)
+				    set_linearActuator_A_cmd(LINEAR_ACTU_CW);
 				    USART_puts(USART3, "\r\n");
-				}else if(received_string[1] == 'B'){
+				}else if(received_string[1] == 'b'){
 				    USART_puts(USART3, "Actu_B_up");
-				    set_linearActuator_B_cmd(LINEAR_ACTU_CW)
+				    set_linearActuator_B_cmd(LINEAR_ACTU_CW);
 				    USART_puts(USART3, "\r\n");
 				}
-			}else if(received_string[0] == 'd')
-				if(received_string[1] == 'A'){
+			}else if(received_string[0] == 'd'){
+				if(received_string[1] == 'a'){
 				    USART_puts(USART3, "Actu_A_down");
-				    set_linearActuator_A_cmd(LINEAR_ACTU_CCW)
+				    set_linearActuator_A_cmd(LINEAR_ACTU_CCW);
 				    USART_puts(USART3, "\r\n");
-				}else if(received_string[1] == 'B'){
+				}else if(received_string[1] == 'b'){
 				    USART_puts(USART3, "Actu_B_down");
-				    set_linearActuator_B_cmd(LINEAR_ACTU_CCW)
+				    set_linearActuator_B_cmd(LINEAR_ACTU_CCW);
 				    USART_puts(USART3, "\r\n");
 				}
 			}else{
