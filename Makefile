@@ -23,6 +23,8 @@ INCLUDE+=-I$(CURDIR)/Libraries/servo_motor
 INCLUDE+=-I$(CURDIR)/Libraries/usart
 INCLUDE+=-I$(CURDIR)/config
 INCLUDE+=-I$(CURDIR)/epw_lib
+INCLUDE+=-I$(CURDIR)/sdio_lib
+INCLUDE+=-I$(CURDIR)/fat_lib
 
 BUILD_DIR = $(CURDIR)/build
 BIN_DIR = $(CURDIR)/binary
@@ -35,7 +37,9 @@ vpath %.c $(CURDIR)/Libraries/STM32F4xx_StdPeriph_Driver/src \
 	  $(CURDIR)/Libraries/usart \
 	  $(CURDIR)/Libraries/syscall $(CURDIR)/hardware $(FREERTOS) \
 	  $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F \
-	  $(CURDIR)/epw_lib
+	  $(CURDIR)/epw_lib \
+	  $(CURDIR)/sdio_lib \
+	  $(CURDIR)/fat_lib
 
 vpath %.s $(STARTUP)
 ASRC=startup_stm32f4xx.s
@@ -65,6 +69,20 @@ SRC+=encoder.c
 SRC+=linear_actuator.c
 #----------------------
 
+# sdio
+SRC+=stm32f4_discovery_sdio_sd.c
+SRC+=stm32f4_discovery_sdio_sd_LowLevel.c
+# fat
+SRC+=fat_access.c
+SRC+=fat_cache.c
+SRC+=fat_filelib.c
+SRC+=fat_format.c
+SRC+=fat_misc.c
+SRC+=fat_string.c
+SRC+=fat_table.c
+SRC+=fat_write.c
+SRC+=example.c
+
 # FreeRTOS Source Files
 SRC+=port.c
 SRC+=list.c
@@ -78,9 +96,10 @@ SRC+=stm32f4xx_syscfg.c
 SRC+=misc.c
 #SRC+=stm32f4xx_adc.c
 #SRC+=stm32f4xx_dac.c
-# SRC+=stm32f4xx_dma.c
+SRC+=stm32f4xx_dma.c
 SRC+=stm32f4xx_exti.c
 #SRC+=stm32f4xx_flash.c
+SRC+=stm32f4xx_sdio.c
 SRC+=stm32f4xx_gpio.c
 SRC+=stm32f4xx_i2c.c
 SRC+=stm32f4xx_rcc.c
