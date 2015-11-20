@@ -9,6 +9,7 @@
 
 extern SD_CardInfo	SDCardInfo;
 
+void SDIO_test(void);
 void SD_NVIC_Configuration(void);
 void print_RCC_Clocks(void);
 void print_all_SD( uint32_t size );

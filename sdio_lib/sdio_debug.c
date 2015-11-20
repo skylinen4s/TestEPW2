@@ -1,5 +1,27 @@
 #include "sdio_debug.h"
 
+void SDIO_test(void)
+{
+    SD_Error error;
+    // interrupt config
+    //SD_NVIC_Configuration();
+    //SD init
+    error = SD_Init();
+    printf("test SDIO without FS\n\r");
+
+    if(error == SD_OK) printf("SD_Init Success.\n\r");
+    else{
+	printf("SD_Init fail.\n\r");
+	printf("status:\t%d\n\r",error);
+    }
+
+    printf("CardType:\t%d\n\r",SDCardInfo.CardType);
+    printf("CardCapacity:\t%d\n\r",SDCardInfo.CardCapacity);
+    printf("CardBlockSize:\t%d\n\r",SDCardInfo.CardBlockSize);
+    printf("ManufactureID:\t%d\n\r",SDCardInfo.SD_cid.ManufacturerID);
+    printf("RCA:\t%d\n\r",SDCardInfo.RCA);
+}
+
 void SD_NVIC_Configuration(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -12,6 +34,12 @@ void SD_NVIC_Configuration(void)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
+
+  // DMA2 STREAMx Interrupt ENABLE
+  NVIC_InitStructure.NVIC_IRQChannel = SD_SDIO_DMA_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_Init(&NVIC_InitStructure);
+
 }
 
 void print_RCC_Clocks(void)
@@ -20,10 +48,10 @@ void print_RCC_Clocks(void)
 	RCC_GetClocksFreq(&RCC_Clocks);
 //  SysTick_Config(RCC_Clocks.HCLK_Frequency / 100);
 	
-	printf("SYSCLK = %u\n", RCC_Clocks.SYSCLK_Frequency);
-	printf("HCLK = %u\n", RCC_Clocks.HCLK_Frequency);
-	printf("PCLK1 = %u\n", RCC_Clocks.PCLK1_Frequency);
-	printf("PCLK2 = %u\n", RCC_Clocks.PCLK2_Frequency);
+	printf("SYSCLK = %u\n\r", RCC_Clocks.SYSCLK_Frequency);
+	printf("HCLK = %u\n\r", RCC_Clocks.HCLK_Frequency);
+	printf("PCLK1 = %u\n\r", RCC_Clocks.PCLK1_Frequency);
+	printf("PCLK2 = %u\n\r", RCC_Clocks.PCLK2_Frequency);
 }
 
 #define PRINT_ROW		32	/* строка */
@@ -171,9 +199,9 @@ void SD_print_error( SD_Error SDError )
 		"SD_UNSUPPORTED_FEATURE",
 		"SD_UNSUPPORTED_HW",
 		"SD_ERROR"
-	};// 	printf("!SDError: %d - %s \n", SDError, SDErrorStr[SDError] );
+	};// 	printf("!SDError: %d - %s \n\r", SDError, SDErrorStr[SDError] );
 	
-	printf("\t!SDError: %d - %s \n", SDError, SDErrorStr[SDError] );
+	printf("\t!SDError: %d - %s \n\r", SDError, SDErrorStr[SDError] );
 }
 void SD_PrintState( uint8_t SDCardState )
 {
@@ -189,9 +217,9 @@ void SD_PrintState( uint8_t SDCardState )
 		"SD_CARD_ERROR"
 	};
 	if(SDCardState < 8)
-		printf("\tSDCardState: %d - %s\n",SDCardState,SDCardStateStr[SDCardState]);
+		printf("\tSDCardState: %d - %s\n\r",SDCardState,SDCardStateStr[SDCardState]);
 	else 
-		printf("\tSDCardState: %d - %s\n",SDCardState,SDCardStateStr[8]);
+		printf("\tSDCardState: %d - %s\n\r",SDCardState,SDCardStateStr[8]);
 	
 }
 
@@ -210,10 +238,10 @@ SD_Error SD_PrintInfo( void )
 		"HIGH_CAPACITY_MMC_CARD"
     };
 	
-	printf("Card info:\n");
+	printf("Card info:\n\r");
 	if ((SDError = SD_GetCardInfo(&SDCardInfo)) != SD_OK)
 	{
-		printf("\tConfigure SD card - FAILED. SD_GetCardInfo()\n");
+		printf("\tConfigure SD card - FAILED. SD_GetCardInfo()\n\r");
 		SD_print_error(SDError);
 		return SDError;
 	}
@@ -222,21 +250,21 @@ SD_Error SD_PrintInfo( void )
 	{
 		SD_PrintState(SD_GetState());
 		
-		printf("\tBlockSize: %d\n", 			SDCardInfo.CardBlockSize);
+		printf("\tBlockSize: %d\n\r", 			SDCardInfo.CardBlockSize);
 		printf("\tCapacity: %"PRIu64" Byte", 	SDCardInfo.CardCapacity);
-		printf(" (%i MiB)\n", (uint32_t)(		SDCardInfo.CardCapacity/1024/1024));
-		printf("\tType: %s\n", 					CardTypes[SDCardInfo.CardType]);
-		printf("\tRCA: %d\n", 					SDCardInfo.RCA);
-		printf("\tCSD.DeviceSize: %d\n", 		SDCardInfo.SD_csd.DeviceSize);
-		printf("\tCSD.DeviceSizeMul: %d\n", 	SDCardInfo.SD_csd.DeviceSizeMul);
-		printf("\tCID:\n");
-		printf("\t\tManufacturerID: %u\n",	SDCardInfo.SD_cid.ManufacturerID);
-		printf("\t\tProdName1: %u\n",		SDCardInfo.SD_cid.ProdName1);
-		printf("\t\tProdName2: %u\n",		SDCardInfo.SD_cid.ProdName2);
-		printf("\t\tProdRev: %u\n",			SDCardInfo.SD_cid.ProdRev);
-		printf("\t\tProdSN: %u\n",			SDCardInfo.SD_cid.ProdSN);
-		printf("\t\tManufactDate: %u\n",	SDCardInfo.SD_cid.ManufactDate);
-		printf("\t\tCID_CRC: %u\n",			SDCardInfo.SD_cid.CID_CRC);
+		printf(" (%i MiB)\n\r", (uint32_t)(		SDCardInfo.CardCapacity/1024/1024));
+		printf("\tType: %s\n\r", 					CardTypes[SDCardInfo.CardType]);
+		printf("\tRCA: %d\n\r", 					SDCardInfo.RCA);
+		printf("\tCSD.DeviceSize: %d\n\r", 		SDCardInfo.SD_csd.DeviceSize);
+		printf("\tCSD.DeviceSizeMul: %d\n\r", 	SDCardInfo.SD_csd.DeviceSizeMul);
+		printf("\tCID:\n\r");
+		printf("\t\tManufacturerID: %u\n\r",	SDCardInfo.SD_cid.ManufacturerID);
+		printf("\t\tProdName1: %u\n\r",		SDCardInfo.SD_cid.ProdName1);
+		printf("\t\tProdName2: %u\n\r",		SDCardInfo.SD_cid.ProdName2);
+		printf("\t\tProdRev: %u\n\r",			SDCardInfo.SD_cid.ProdRev);
+		printf("\t\tProdSN: %u\n\r",			SDCardInfo.SD_cid.ProdSN);
+		printf("\t\tManufactDate: %u\n\r",	SDCardInfo.SD_cid.ManufactDate);
+		printf("\t\tCID_CRC: %u\n\r",			SDCardInfo.SD_cid.CID_CRC);
 		
 		SD_PrintState(SD_GetState());
 	}
@@ -248,67 +276,67 @@ SD_Error SD_PrintCardStatus( void )
 	SD_Error		SDError;
 	SD_CardStatus	SDCardStatus;
 	
-	printf("CardStatus:\n");
+	printf("CardStatus:\n\r");
 	if ((SDError = SD_GetCardStatus(&SDCardStatus)) != SD_OK)
 	{
-		printf("\tConfigure SD card - FAILED. SD_GetCardStatus()\n");
+		printf("\tConfigure SD card - FAILED. SD_GetCardStatus()\n\r");
 		SD_print_error(SDError);
 		return SDError;
 	}
 	
 	if(SDError == SD_OK)
 	{
-		printf("\tDAT_BUS_WIDTH = %i\n",	SDCardStatus.DAT_BUS_WIDTH);	//   __IO uint8_t DAT_BUS_WIDTH;
-		printf("\tSECURED_MODE = %i\n",		SDCardStatus.SECURED_MODE);		//   __IO uint8_t SECURED_MODE;
-		printf("\tSD_CARD_TYPE = %i\n",		SDCardStatus.SD_CARD_TYPE);		//   __IO uint16_t SD_CARD_TYPE;
-		printf("\tSIZE_OF_PROTECTED_AREA = %i\n",SDCardStatus.SIZE_OF_PROTECTED_AREA);//   __IO uint32_t SIZE_OF_PROTECTED_AREA;
-		printf("\tSPEED_CLASS = %i\n",		SDCardStatus.SPEED_CLASS);		//   __IO uint8_t SPEED_CLASS;
-		printf("\tPERFORMANCE_MOVE = %i\n",	SDCardStatus.PERFORMANCE_MOVE);	//   __IO uint8_t PERFORMANCE_MOVE;
-		printf("\tAU_SIZE = %i\n",			SDCardStatus.AU_SIZE);			//   __IO uint8_t AU_SIZE;
-		printf("\tERASE_SIZE = %i\n",		SDCardStatus.ERASE_SIZE);		//   __IO uint16_t ERASE_SIZE;
-		printf("\tERASE_TIMEOUT = %i\n",	SDCardStatus.ERASE_TIMEOUT);	//   __IO uint8_t ERASE_TIMEOUT;
-		printf("\tERASE_OFFSET = %i\n",		SDCardStatus.ERASE_OFFSET);		//   __IO uint8_t ERASE_OFFSET;
+		printf("\tDAT_BUS_WIDTH = %i\n\r",	SDCardStatus.DAT_BUS_WIDTH);	//   __IO uint8_t DAT_BUS_WIDTH;
+		printf("\tSECURED_MODE = %i\n\r",		SDCardStatus.SECURED_MODE);		//   __IO uint8_t SECURED_MODE;
+		printf("\tSD_CARD_TYPE = %i\n\r",		SDCardStatus.SD_CARD_TYPE);		//   __IO uint16_t SD_CARD_TYPE;
+		printf("\tSIZE_OF_PROTECTED_AREA = %i\n\r",SDCardStatus.SIZE_OF_PROTECTED_AREA);//   __IO uint32_t SIZE_OF_PROTECTED_AREA;
+		printf("\tSPEED_CLASS = %i\n\r",		SDCardStatus.SPEED_CLASS);		//   __IO uint8_t SPEED_CLASS;
+		printf("\tPERFORMANCE_MOVE = %i\n\r",	SDCardStatus.PERFORMANCE_MOVE);	//   __IO uint8_t PERFORMANCE_MOVE;
+		printf("\tAU_SIZE = %i\n\r",			SDCardStatus.AU_SIZE);			//   __IO uint8_t AU_SIZE;
+		printf("\tERASE_SIZE = %i\n\r",		SDCardStatus.ERASE_SIZE);		//   __IO uint16_t ERASE_SIZE;
+		printf("\tERASE_TIMEOUT = %i\n\r",	SDCardStatus.ERASE_TIMEOUT);	//   __IO uint8_t ERASE_TIMEOUT;
+		printf("\tERASE_OFFSET = %i\n\r",		SDCardStatus.ERASE_OFFSET);		//   __IO uint8_t ERASE_OFFSET;
 	}
 	return SD_OK;
 }
 
 void SD_test( void )
 {	
-	static uint32_t sdioclk = ((HSE_VALUE/8)*336)/6;
+	static uint32_t sdioclk = ((HSE_VALUE/8)*336)/7;
 	SD_Error		SDError;
 	
-	printf("Configure SD card...\n");
+	printf("Configure SD card...\n\r");
 	
 	print_RCC_Clocks();
-	printf("SDIOCLK = ((HSE_VALUE / PLL_M) * PLL_N) / PLLQ = %u\n", sdioclk);
-//	printf("For init: SDIO_CK = SDIOCLK / (SDIO_INIT_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_INIT_CLK_DIV + 2)));
-//	printf("For transfer: SDIO_CK = SDIOCLK / (SDIO_TRANSFER_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_TRANSFER_CLK_DIV + 2)));
+	printf("SDIOCLK = ((HSE_VALUE / PLL_M) * PLL_N) / PLLQ = %u\n\r", sdioclk);
+	printf("For init: SDIO_CK = SDIOCLK / (SDIO_INIT_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_INIT_CLK_DIV + 2)));
+	printf("For transfer: SDIO_CK = SDIOCLK / (SDIO_TRANSFER_CLK_DIV + 2) = %i\n",(sdioclk/(SDIO_TRANSFER_CLK_DIV + 2)));
 	
 	#ifdef SD_DMA_MODE
-	printf("SD_DMA_MODE\n");
+	printf("SD_DMA_MODE\n\r");
 	#endif
 	
 	#ifdef SD_POLLING_MODE
-	printf("SD_POLLING_MODE\n");
+	printf("SD_POLLING_MODE\n\r");
 	#endif
 	
 	if ((SDError = SD_Init()) != SD_OK)
 	{
-		printf("\tConfigure SD card - FAILED. SD_Init()\n");
+		printf("\tConfigure SD card - FAILED. SD_Init()\n\r");
 		SD_print_error(SDError);
 	}
 	
 	SD_PrintInfo();
 	SD_PrintCardStatus();
-    printf("Configure SD card - OK.\n");
+    printf("Configure SD card - OK.\n\r");
 	
 	if ((SDError = SD_GetCardInfo(&SDCardInfo)) != SD_OK)
 	{
-		printf("\tConfigure SD card - FAILED. SD_GetCardInfo()\n");
+		printf("\tConfigure SD card - FAILED. SD_GetCardInfo()\n\r");
 		SD_print_error(SDError);
 	}	
-	printf("Run print all SD in Hex. %u bloks.\n",SDCardInfo.SD_csd.DeviceSize);
-	print_all_SD(SDCardInfo.SD_csd.DeviceSize);
+	printf("Run print all SD in Hex. %u bloks.\n\r",SDCardInfo.SD_csd.DeviceSize);
+	//print_all_SD(SDCardInfo.SD_csd.DeviceSize);
 }
 //******************************************************************************
 

@@ -70,6 +70,7 @@ SRC+=linear_actuator.c
 #----------------------
 
 # sdio
+SRC+=sdio_debug.c
 SRC+=stm32f4_discovery_sdio_sd.c
 SRC+=stm32f4_discovery_sdio_sd_LowLevel.c
 # fat
