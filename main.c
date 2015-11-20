@@ -11,6 +11,8 @@
 #include "motor.h"
 //#include "transfer.h"
 #include "linear_actuator.h"
+#include "example.h"
+#include "sdio_debug.h"
 
 void init_UserButton(void);
 void init_LED(void);
@@ -56,6 +58,11 @@ void initialize()
     init_encoder();
     init_encoder_exti();
     init_linear_actuator();
+    
+    USART_puts(USART3,"test sdio/fat \n\r");
+    example_fat();
+    //SD_test();
+    USART_puts(USART3,"test end \n\r");
 }
 
 int main(void)
