@@ -6,7 +6,7 @@ int media_init()
 {
     // initialize SDIO
     SD_Init();
-    //SD_NVIC_Configuration();
+    SD_NVIC_Configuration();
     return 1;
 }
 
@@ -22,7 +22,7 @@ int media_read(unsigned long sector, unsigned char *buffer, unsigned long sector
         //..
 
 	error = SD_ReadBlock(buffer,sector*512,512);
-	//error = SD_WaitReadOperation();
+	error = SD_WaitReadOperation();
 	while(SD_GetStatus() != SD_TRANSFER_OK);
         sector ++;
         buffer += 512;
@@ -43,7 +43,7 @@ int media_write(unsigned long sector, unsigned char *buffer, unsigned long secto
         //..
 
 	error = SD_WriteBlock(buffer,sector*512,512);
-	//error = SD_WaitWriteOperation();
+	error = SD_WaitWriteOperation();
 	while(SD_GetStatus() != SD_TRANSFER_OK);
         sector ++;
         buffer += 512;
@@ -96,4 +96,14 @@ void example_fat()
     fl_listdirectory("/");
 
     fl_shutdown();
+}
+
+void SDIO_IRQHandler(void)
+{
+    SD_ProcessIRQSrc();
+}
+
+void SD_SDIO_DMA_IRQHANDLER(void)
+{
+    SD_ProcessDMAIRQ();
 }
