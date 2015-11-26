@@ -1,5 +1,185 @@
 #include "sdio_debug.h"
 
+typedef enum{
+    FAILED = 0,
+    PASSED = !FAILED
+} TestStatus;
+
+__IO TestStatus EraseStatus = FAILED;
+__IO TestStatus TransferStatus1 = FAILED;
+__IO TestStatus TransferStatus2 = FAILED;
+
+#define SD_OPERATION_ERASE          0
+#define SD_OPERATION_BLOCK          1
+#define SD_OPERATION_MULTI_BLOCK    2
+#define SD_OPERATION_END            3
+
+#define BLOCK_SIZE              512 /* Block Size in Bytes */
+#define NUMBER_OF_BLOCKS        2/* for Multi Blocks operation(Read/Write) */
+#define MULTI_BUFFER_SIZE       (BLOCK_SIZE * NUMBER_OF_BLOCKS)
+
+uint8_t aBuffer_Block_Tx[BLOCK_SIZE];
+uint8_t aBuffer_Block_Rx[BLOCK_SIZE];
+uint8_t aBuffer_MultiBlock_Tx[MULTI_BUFFER_SIZE];
+uint8_t aBuffer_MultiBlock_Rx[MULTI_BUFFER_SIZE];
+
+static void SD_EraseTest(void);
+static void SD_SingleBlockTest(void);
+static void SD_MultiBlockTest(void);
+static void Fill_Buffer(uint8_t *pBuffer, uint32_t BufferLength, uint32_t Offset);
+static __IO TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength);
+static __IO TestStatus eBuffercmp(uint8_t* pBuffer, uint32_t BufferLength);
+
+__IO uint32_t uwSDCardOperation = SD_OPERATION_BLOCK;
+
+
+/**
+ * @brief Tests the SD card erase operation.
+ * @param None
+ * @retval None
+ */
+static void SD_EraseTest(void)
+{
+    SD_Error status = SD_OK;
+    /*---------------Block Erase----------------*/
+    /* Erase NumberOfBlocks Blocks of WRITE_BL_LEN(512 Bytes) */
+    //status = SD_Erase(0x00, (BLOCK_SIZE * NUMBER_OF_BLOCKS));
+    if(status != SD_OK) printf("SD_Erase failed: %d.\n\r",status);
+
+    if(status == SD_OK)
+    {
+	printf("SD_Erase ok, performing SD_ReadMultiBlocks.\n\r");
+	status = SD_ReadMultiBlocks(aBuffer_MultiBlock_Rx, 0x0, BLOCK_SIZE, NUMBER_OF_BLOCKS);
+	if(status != SD_OK){printf("SD_ReadMultiBlocks Failed\n\r");}
+
+	/* Check if the Transfer is finished */
+	status = SD_WaitReadOperation();
+	if(status != SD_OK){printf("SD_WaitReadOperation Failed\n\r");}
+
+	/* Wait until end of the DMA transfer */
+	while(SD_GetStatus() != SD_TRANSFER_OK);
+
+	printf("SD_TRANSFER OK\n\r");
+    }
+
+    /* Check the correctness of erased blocks */
+    if(status == SD_OK)
+    {
+	EraseStatus = eBuffercmp(aBuffer_MultiBlock_Rx, MULTI_BUFFER_SIZE);
+    }
+
+    if(EraseStatus == PASSED) printf("SD erase test passed!\n\r");
+}
+
+/**
+ * @brief Tests the SD card Single Blocks operations.
+ * @param None
+ * @retval None
+ */
+static void SD_SingleBlockTest(void)
+{
+    SD_Error status;
+    /*---------------Block Read/Write----------------*/
+    /* Fill the buffer to send */
+    Fill_Buffer(aBuffer_Block_Tx, BLOCK_SIZE, 0x320F);
+
+    /* Write Block of 512 bytes on address 0 */
+    status = SD_WriteBlock(aBuffer_Block_Tx, 0x00, BLOCK_SIZE);
+    /* check if the Transfer finished */
+    status = SD_WaitWriteOperation();
+    while(SD_GetStatus() != SD_TRANSFER_OK);
+
+    if(status == SD_OK)
+    {
+	/* Read Block of 512 bytes on address 0 */
+	status = SD_ReadBlock(aBuffer_Block_Rx, 0x00, BLOCK_SIZE);
+	/* check if the Transfer finished */
+	status = SD_WaitReadOperation();
+	while(SD_GetStatus() != SD_TRANSFER_OK);
+    }
+
+    /* Check the correctness of written data */
+    if(status == SD_OK)
+    {
+	TransferStatus1 = Buffercmp(aBuffer_Block_Tx, aBuffer_Block_Rx,BLOCK_SIZE);
+    }
+
+    if(TransferStatus1 == PASSED) printf("SD single block test passed!\n\r");
+}
+
+
+/**
+ * @brief Tests the SD card Multiple Blocks operations.
+ * @param None
+ * @retval None
+ */
+static void SD_MultiBlockTest(void)
+{
+    SD_Error status;
+
+    /* Fill the buffer to send */
+    Fill_Buffer(aBuffer_MultiBlock_Tx, MULTI_BUFFER_SIZE, 0x0);
+
+    /* Write Multiple Block of many bytes on address 0 */
+    status = SD_WriteMultiBlocksFIXED(aBuffer_MultiBlock_Tx, 0, BLOCK_SIZE, NUMBER_OF_BLOCKS);
+    /* check if the Transfer finished */
+    status = SD_WaitWriteOperation();
+    while(SD_GetStatus() != SD_TRANSFER_OK);
+
+    if(status == SD_OK)
+    {
+	/* Read Block of many bytes from address 0 */
+	status = SD_ReadMultiBlocksFIXED(aBuffer_MultiBlock_Rx, 0, BLOCK_SIZE, NUMBER_OF_BLOCKS);
+	/* check if the Transfer finished */
+	status = SD_WaitReadOperation();
+	while(SD_GetStatus() != SD_TRANSFER_OK);
+    }
+
+    /* Check the correctness of written data */
+    if(status == SD_OK)
+    {
+	TransferStatus2 = Buffercmp(aBuffer_MultiBlock_Tx, aBuffer_MultiBlock_Rx,MULTI_BUFFER_SIZE);
+    }
+
+    if(TransferStatus2 == PASSED) printf("SD Multiple block test passed!\n\r");
+
+}
+
+static void Fill_Buffer(uint8_t* pBuffer, uint32_t BufferLength, uint32_t Offset)
+{
+    uint16_t index = 0;
+
+    /* Put in global buffer same values */
+    for(index = 0; index < BufferLength; index++)
+    {
+	pBuffer[index] = index + Offset;
+    }
+}
+
+static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength)
+{
+    while(BufferLength--)
+    {
+	if(*pBuffer1 != *pBuffer2) return FAILED;
+
+	pBuffer1++;
+	pBuffer2++;
+    }
+    return PASSED;
+}
+
+static TestStatus eBuffercmp(uint8_t* pBuffer, uint32_t BufferLength)
+{
+    while(BufferLength--)
+    {
+	/* In Some SD cards the erased stats is 0XFF, in others it's 0x00 */
+	if((*pBuffer != 0xFF) && (*pBuffer != 0x00)) return FAILED;
+	pBuffer++;
+    }
+    return PASSED;
+}
+
+
 void SDIO_test(void)
 {
     SD_Error error;
@@ -20,6 +200,35 @@ void SDIO_test(void)
     printf("CardBlockSize:\t%d\n\r",SDCardInfo.CardBlockSize);
     printf("ManufactureID:\t%d\n\r",SDCardInfo.SD_cid.ManufacturerID);
     printf("RCA:\t%d\n\r",SDCardInfo.RCA);
+
+
+    while((error == SD_OK) && (uwSDCardOperation != SD_OPERATION_END))
+    {
+	switch(uwSDCardOperation)
+	{
+	    /* -------------------SD single block test--------------------- */
+	    case(SD_OPERATION_BLOCK):
+	    {
+		SD_SingleBlockTest();
+		uwSDCardOperation = SD_OPERATION_ERASE;
+		break;
+	    }
+	    /* -------------------SD Erase test--------------------- */
+	    case(SD_OPERATION_ERASE):
+	    {
+		SD_EraseTest();
+		uwSDCardOperation = SD_OPERATION_MULTI_BLOCK;
+		break;
+	    }
+	    /* -------------------SD single block test--------------------- */
+	    case(SD_OPERATION_MULTI_BLOCK):
+	    {
+		SD_MultiBlockTest();
+		uwSDCardOperation = SD_OPERATION_END;
+		break;
+	    }
+	}
+    }
 }
 
 void SD_NVIC_Configuration(void)
@@ -255,8 +464,11 @@ SD_Error SD_PrintInfo( void )
 		printf(" (%i MiB)\n\r", (uint32_t)(		SDCardInfo.CardCapacity/1024/1024));
 		printf("\tType: %s\n\r", 					CardTypes[SDCardInfo.CardType]);
 		printf("\tRCA: %d\n\r", 					SDCardInfo.RCA);
+		printf("\tCSD.MaxBusClkFrec: %d\n\r", 		SDCardInfo.SD_csd.MaxBusClkFrec);
 		printf("\tCSD.DeviceSize: %d\n\r", 		SDCardInfo.SD_csd.DeviceSize);
 		printf("\tCSD.DeviceSizeMul: %d\n\r", 	SDCardInfo.SD_csd.DeviceSizeMul);
+		printf("\tCSD.RdBlockLen: %d\n\r",		SDCardInfo.SD_csd.RdBlockLen);
+		printf("\tCSD.MaxWrBlockLen: %d\n\r",		SDCardInfo.SD_csd.MaxWrBlockLen);
 		printf("\tCID:\n\r");
 		printf("\t\tManufacturerID: %u\n\r",	SDCardInfo.SD_cid.ManufacturerID);
 		printf("\t\tProdName1: %u\n\r",		SDCardInfo.SD_cid.ProdName1);

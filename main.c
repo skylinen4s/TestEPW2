@@ -60,8 +60,8 @@ void initialize()
     init_linear_actuator();
     
     USART_puts(USART3,"test sdio/fat \n\r");
-    example_fat();
-    //SDIO_test();
+    //example_fat();
+    SDIO_test();
     USART_puts(USART3,"test end \n\r");
 }
 
