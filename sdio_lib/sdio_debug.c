@@ -43,7 +43,7 @@ static void SD_EraseTest(void)
     SD_Error status = SD_OK;
     /*---------------Block Erase----------------*/
     /* Erase NumberOfBlocks Blocks of WRITE_BL_LEN(512 Bytes) */
-    //status = SD_Erase(0x00, (BLOCK_SIZE * NUMBER_OF_BLOCKS));
+    status = SD_Erase(0x00, (BLOCK_SIZE * NUMBER_OF_BLOCKS));
     if(status != SD_OK) printf("SD_Erase failed: %d.\n\r",status);
 
     if(status == SD_OK)
@@ -249,6 +249,16 @@ void SD_NVIC_Configuration(void)
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_Init(&NVIC_InitStructure);
 
+}
+
+void SDIO_IRQHandler(void)
+{
+    SD_ProcessIRQSrc();
+}
+
+void SD_SDIO_DMA_IRQHANDLER(void)
+{
+    SD_ProcessDMAIRQ();
 }
 
 void print_RCC_Clocks(void)
