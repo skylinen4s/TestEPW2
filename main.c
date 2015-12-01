@@ -11,7 +11,6 @@
 #include "motor.h"
 //#include "transfer.h"
 #include "linear_actuator.h"
-#include "example.h"
 #include "sdio_debug.h"
 
 void init_UserButton(void);
@@ -60,7 +59,6 @@ void initialize()
     init_linear_actuator();
     
     USART_puts(USART3,"test sdio/fat \n\r");
-    //example_fat();
     SDIO_test();
     USART_puts(USART3,"test end \n\r");
 }
