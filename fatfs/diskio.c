@@ -8,15 +8,13 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"		/* FatFs lower layer API */
-#include "usbdisk.h"	/* Example: Header file of existing USB MSD control module */
-#include "atadrive.h"	/* Example: Header file of existing ATA harddisk control module */
-#include "sdcard.h"		/* Example: Header file of existing MMC/SDC contorl module */
+#include "sdio_debug.h"	/* SDIO configuration */
+#include "stm32f4_discovery_sdio_sd.h"
 
 /* Definitions of physical drive number for each drive */
-#define ATA		0	/* Example: Map ATA harddisk to physical drive 0 */
-#define MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
-#define USB		2	/* Example: Map USB MSD to physical drive 2 */
+#define SD		0	/* Map SD card to physical drive 0 */
 
+#define BLOCK_SIZE 512
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -26,32 +24,26 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat;
-	int result;
+	if(pdrv) return STA_NOINIT;
 
-	switch (pdrv) {
-	case ATA :
-		result = ATA_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case MMC :
-		result = MMC_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case USB :
-		result = USB_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
+	switch(SD_GetState())
+	{
+		case SD_CARD_READY:
+			return RES_OK;
+		case SD_CARD_IDENTIFICATION:
+		case SD_CARD_STANDBY:
+		case SD_CARD_TRANSFER:
+		case SD_CARD_SENDING:
+		case SD_CARD_RECEIVING:
+		case SD_CARD_PROGRAMMING:
+		case SD_CARD_DISCONNECTED:
+			return RES_NOTRDY;
+		case SD_CARD_ERROR:
+		default:
+			return RES_ERROR;
 	}
-	return STA_NOINIT;
+
+	return STA_NODISK;
 }
 
 
@@ -64,34 +56,17 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat;
-	int result;
+	SD_Error status;
 
-	switch (pdrv) {
-	case ATA :
-		result = ATA_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case MMC :
-		result = MMC_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case USB :
-		result = USB_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
+	if(pdrv == SD) /* if pdrv == SD(0) */
+	{
+		if((status = SD_Init()) == SD_OK) return 0;
+		else if(status == SD_DATA_CRC_FAIL) return STA_NODISK;
+		else return STA_NOINIT;
 	}
+
 	return STA_NOINIT;
 }
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -105,36 +80,32 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	DRESULT res;
-	int result;
+	SD_Error status;
 
-	switch (pdrv) {
-	case ATA :
-		// translate the arguments here
+	if(pdrv == SD)
+	{
+		if(count != 1)
+		{
+			status = SD_ReadBlock(buff, sector*BLOCK_SIZE, BLOCK_SIZE) ;
+		}
+		else if(count<=47)
+		{
+			status = SD_ReadMultiBlocks(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
+			//Number of blocks (counts) exceeds '47' cant work correctly.
+		}
+		else
+		{
+			return RES_PARERR;
+		}
+		if(status != SD_OK) return RES_ERROR;
 
-		result = ATA_disk_read(buff, sector, count);
+		#ifdef SD_DMA_MODE
+		status = SD_WaitReadOperation();
+		if(status != SD_OK) return RES_ERROR;
+		#endif
 
-		// translate the reslut code here
-
-		return res;
-
-	case MMC :
-		// translate the arguments here
-
-		result = MMC_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case USB :
-		// translate the arguments here
-
-		result = USB_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
+		while(SD_GetStatus() != SD_TRANSFER_OK);
+		if(status == SD_OK) return RES_OK;
 	}
 
 	return RES_PARERR;
@@ -154,36 +125,32 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	DRESULT res;
-	int result;
+	SD_Error status;
 
-	switch (pdrv) {
-	case ATA :
-		// translate the arguments here
+	if(pdrv == SD)
+	{
+		if(count != 1)
+		{
+			status = SD_WriteBlock(buff, sector*BLOCK_SIZE, BLOCK_SIZE);
+		}
+		else if(count<=47)
+		{
+			status = SD_WriteMultiBlocks(buff, sector*BLOCK_SIZE, BLOCK_SIZE, count);
+			//Number of blocks (counts) exceeds '47' cant work correctly.
+		}
+		else
+		{
+			return RES_PARERR;
+		}
+		if(status != SD_OK) return RES_ERROR;
 
-		result = ATA_disk_write(buff, sector, count);
+		#ifdef SD_DMA_MODE
+		status = SD_WaitWriteOperation();
+		if(status != SD_OK) return RES_ERROR;
+		#endif
 
-		// translate the reslut code here
-
-		return res;
-
-	case MMC :
-		// translate the arguments here
-
-		result = MMC_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case USB :
-		// translate the arguments here
-
-		result = USB_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
+		while(SD_GetStatus() != SD_TRANSFER_OK);
+		if(status == SD_OK) return RES_OK;
 	}
 
 	return RES_PARERR;
@@ -205,26 +172,51 @@ DRESULT disk_ioctl (
 	DRESULT res;
 	int result;
 
-	switch (pdrv) {
-	case ATA :
-
-		// Process of the command for the ATA drive
-
-		return res;
-
-	case MMC :
-
-		// Process of the command for the MMC/SD card
-
-		return res;
-
-	case USB :
-
-		// Process of the command the USB drive
-
+	if(pdrv == SD)
+	{
+		switch(cmd)
+		{
+			case CTRL_SYNC:
+				while(SDIO_GetResponse(SDIO_RESP1) == 0);
+				res = RES_OK;
+				break;
+			case GET_SECTOR_COUNT:
+				*(DWORD*)buff = SDCardInfo.CardCapacity >> 10;
+				// Capacity / 1024 (bytes)
+				res = RES_OK;
+				break;
+			case GET_SECTOR_SIZE:
+				*(DWORD*)buff = SDCardInfo.SD_csd.DeviceSize;
+				// DeviceSize = SectorSize , (this value+1) * 512 = Capacity (bytes)
+				res = RES_OK;
+				break;
+			case GET_BLOCK_SIZE;
+				*(DWORD*)buff = SDCardInfo.CardBlockSize;
+				res = RES_OK;
+				break;
+			default:
+				res = RES_PARERR;
+				break;
+		}
 		return res;
 	}
 
 	return RES_PARERR;
 }
 #endif
+
+/*-----------------------------------------------------------------------*/
+/* User defined functions to give a current time to fatfs module         */
+/* 31-25: Year(0-127 org.1980), 24-21: Month(1-12), 20-16: Day(1-31)     */
+/* 15-11: Houre(0-23), 10-5: Minute(0-59), 4-0: Second(0-29 *2)          */
+/*-----------------------------------------------------------------------*/
+DWORD get_fattime(void)(
+{
+	return ((2013UL-1980) << 25)	//Year = 2006
+			| (8UL << 21)			//Month = Feb
+			| (30UL << 16)			//Day = 9
+			| (13U << 11)			//Hour = 22
+			| (00U << 5)			//Min = 30
+			| (00U >> 1)			//Sec = 0
+			;
+}
