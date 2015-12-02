@@ -26,6 +26,7 @@ DSTATUS disk_status (
 {
 	if(pdrv) return STA_NOINIT;
 
+	#if 0
 	switch(SD_GetState())
 	{
 		case SD_CARD_READY:
@@ -44,6 +45,8 @@ DSTATUS disk_status (
 	}
 
 	return STA_NODISK;
+	#endif
+	return 0;
 }
 
 
@@ -60,7 +63,8 @@ DSTATUS disk_initialize (
 
 	if(pdrv == SD) /* if pdrv == SD(0) */
 	{
-		if((status = SD_Init()) == SD_OK) return 0;
+		status = SD_Init();
+		if(status == SD_OK) return 0;
 		else if(status == SD_DATA_CRC_FAIL) return STA_NODISK;
 		else return STA_NOINIT;
 	}
@@ -102,6 +106,7 @@ DRESULT disk_read (
 		#ifdef SD_DMA_MODE
 		status = SD_WaitReadOperation();
 		if(status != SD_OK) return RES_ERROR;
+
 		#endif
 
 		while(SD_GetStatus() != SD_TRANSFER_OK);
@@ -129,7 +134,7 @@ DRESULT disk_write (
 
 	if(pdrv == SD)
 	{
-		if(count != 1)
+		if(count == 1)
 		{
 			status = SD_WriteBlock(buff, sector*BLOCK_SIZE, BLOCK_SIZE);
 		}
@@ -170,7 +175,6 @@ DRESULT disk_ioctl (
 )
 {
 	DRESULT res;
-	int result;
 
 	if(pdrv == SD)
 	{
@@ -190,7 +194,7 @@ DRESULT disk_ioctl (
 				// DeviceSize = SectorSize , (this value+1) * 512 = Capacity (bytes)
 				res = RES_OK;
 				break;
-			case GET_BLOCK_SIZE;
+			case GET_BLOCK_SIZE:
 				*(DWORD*)buff = SDCardInfo.CardBlockSize;
 				res = RES_OK;
 				break;
@@ -210,7 +214,7 @@ DRESULT disk_ioctl (
 /* 31-25: Year(0-127 org.1980), 24-21: Month(1-12), 20-16: Day(1-31)     */
 /* 15-11: Houre(0-23), 10-5: Minute(0-59), 4-0: Second(0-29 *2)          */
 /*-----------------------------------------------------------------------*/
-DWORD get_fattime(void)(
+DWORD get_fattime(void)
 {
 	return ((2013UL-1980) << 25)	//Year = 2006
 			| (8UL << 21)			//Month = Feb
