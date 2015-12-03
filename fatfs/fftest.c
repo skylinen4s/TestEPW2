@@ -23,7 +23,10 @@ FRESULT ff_test(void)
     res = f_open(&file2, "var.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
     if(res != FR_OK) printf("open failed: %d\n\r", res);
     
-    res = f_write(&file, buff, sizeof(buff), &bw);
+    res = f_write(&file, buff, 12 * sizeof(char), &bw);
+    res = f_printf(&file, "test-");
+    res = f_printf(&file, "speed:%d,%d\n\r",speed[0],speed[1]);
+    res = f_puts("end of file\n\r", &file);
 
     speed[0] = 65;
     speed[1] = 1;
@@ -42,29 +45,32 @@ FRESULT ff_test(void)
 
 FRESULT ff_read(void)
 {
+    char line[20];
+
     printf("ff_read begin\n\r");
     res = f_mount(&fatfs, "", 0);
     if(res != FR_OK) printf("mount failed: %d\n\r", res);
 
     res = f_open(&file, "test.txt", FA_READ);
-    res = f_open(&file2, "log.txt", FA_READ);
+    res = f_open(&file2, "var.txt", FA_READ);
     if(res != FR_OK) printf("open failed: %d\n\r", res);
 
     speed[0] = 1;
     speed[1] = 0;
+
     while(1)
     {
-	res = f_read(&file, buff, sizeof(buff), &br);
-	res = f_read(&file2, speed, sizeof(speed), &br);
-	if(res != FR_OK) printf("read failed: %d\n\r", res);
-	if(res || br ==0) break;
-	USART_puts(USART3, buff);
-	USART_putd(USART3, br);
+	f_gets(line, sizeof(line), &file);
+	if(line[0] == 0) break;
+	USART_puts(USART3, line);
 
 	int i;
-	for(i = 0; i < 20; i++) buff[i] = 0;
+	for(i = 0; i < 20; i++) line[i] = 0;
     }
+
+    res = f_read(&file2, speed, sizeof(speed), &br);
     printf("speed:%d, %d\n\r",speed[0], speed[1]);
+
     res = f_close(&file);
     res = f_close(&file2);
     if(res != FR_OK) printf("close failed: %d\n\r", res);
