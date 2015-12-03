@@ -6,5 +6,6 @@
 #include "stm32f4_discovery_sdio_sd.h"
 
 FRESULT ff_test(void);
+FRESULT ff_read(void);
 
 #endif

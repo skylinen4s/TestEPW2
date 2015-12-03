@@ -63,6 +63,7 @@ void initialize()
     USART_puts(USART3,"test sdio/fat \n\r");
     //SDIO_test();
     ff_test();
+    ff_read();
     USART_puts(USART3,"test end \n\r");
 }
 
