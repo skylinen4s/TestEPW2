@@ -10,6 +10,8 @@
 #include "uart.h"
 #include "motor.h"
 //#include "transfer.h"
+#include "ff.h"
+#include "fftest.h"
 #include "linear_actuator.h"
 #include "sdio_debug.h"
 
@@ -59,7 +61,9 @@ void initialize()
     init_linear_actuator();
     
     USART_puts(USART3,"test sdio/fat \n\r");
-    SDIO_test();
+    //SDIO_test();
+    ff_test();
+    ff_read();
     USART_puts(USART3,"test end \n\r");
 }
 

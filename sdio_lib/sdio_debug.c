@@ -85,16 +85,20 @@ static void SD_SingleBlockTest(void)
 
     /* Write Block of 512 bytes on address 0 */
     status = SD_WriteBlock(aBuffer_Block_Tx, 0x00, BLOCK_SIZE);
+    if(status != SD_OK) printf("SD_WriteBlock failed: %d.\n\r",status);
     /* check if the Transfer finished */
     status = SD_WaitWriteOperation();
+    if(status != SD_OK) printf("SD_WaitWrite failed: %d.\n\r",status);
     while(SD_GetStatus() != SD_TRANSFER_OK);
 
     if(status == SD_OK)
     {
 	/* Read Block of 512 bytes on address 0 */
 	status = SD_ReadBlock(aBuffer_Block_Rx, 0x00, BLOCK_SIZE);
+	if(status != SD_OK) printf("SD_ReadBlock failed: %d.\n\r",status);
 	/* check if the Transfer finished */
 	status = SD_WaitReadOperation();
+	if(status != SD_OK) printf("SD_WaitRead failed: %d.\n\r",status);
 	while(SD_GetStatus() != SD_TRANSFER_OK);
     }
 
@@ -122,16 +126,20 @@ static void SD_MultiBlockTest(void)
 
     /* Write Multiple Block of many bytes on address 0 */
     status = SD_WriteMultiBlocksFIXED(aBuffer_MultiBlock_Tx, 0, BLOCK_SIZE, NUMBER_OF_BLOCKS);
+    if(status != SD_OK) printf("SD_WriteMulti failed: %d.\n\r",status);
     /* check if the Transfer finished */
     status = SD_WaitWriteOperation();
+    if(status != SD_OK) printf("SD_WaitWrite failed: %d.\n\r",status);
     while(SD_GetStatus() != SD_TRANSFER_OK);
 
     if(status == SD_OK)
     {
 	/* Read Block of many bytes from address 0 */
 	status = SD_ReadMultiBlocksFIXED(aBuffer_MultiBlock_Rx, 0, BLOCK_SIZE, NUMBER_OF_BLOCKS);
+	if(status != SD_OK) printf("SD_ReadMulti failed: %d.\n\r",status);
 	/* check if the Transfer finished */
 	status = SD_WaitReadOperation();
+	if(status != SD_OK) printf("SD_WaitRead failed: %d.\n\r",status);
 	while(SD_GetStatus() != SD_TRANSFER_OK);
     }
 
