@@ -14,8 +14,32 @@
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
-
 void init_motor(void){
+	init_switch();
+	init_motorPWM();
+}
+
+void init_switch(void){
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	/* Enable GPIOD clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+
+	/* Enable SWITCH pins for the motors*/
+	GPIO_InitStructure.GPIO_Pin = MOTOR_RELAY_PIN | MOTOR_LEFT_SW_PIN | MOTOR_RIGHT_SW_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(MOTOR_PWM_PORT, &GPIO_InitStructure);
+
+	/* initial(off) */
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_RESET);
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_RESET);
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_RESET);
+}
+
+void init_motorPWM(void){
 	GPIO_InitTypeDef GPIO_InitStructure;
 	/* Enable TIM4 clock */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
@@ -23,7 +47,7 @@ void init_motor(void){
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	
 	/* Enable PWM pins for the motors */
-	GPIO_InitStructure.GPIO_Pin = MOTOR_LEFT_PWM_PIN | MOTOR_RIGHT_PWM_PIN;
+	GPIO_InitStructure.GPIO_Pin = MOTOR_LEFT_CV_PIN | MOTOR_RIGHT_CV_PIN | MOTOR_LEFT_PWM_PIN | MOTOR_RIGHT_PWM_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -31,6 +55,8 @@ void init_motor(void){
 	GPIO_Init(MOTOR_PWM_PORT, &GPIO_InitStructure);
 	
 	/*Connect TIM4 pins to AF*/
+	GPIO_PinAFConfig(MOTOR_PWM_PORT, GPIO_PinSource12, GPIO_AF_TIM4);
+	GPIO_PinAFConfig(MOTOR_PWM_PORT, GPIO_PinSource13, GPIO_AF_TIM4);
 	GPIO_PinAFConfig(MOTOR_PWM_PORT, GPIO_PinSource14, GPIO_AF_TIM4);
 	GPIO_PinAFConfig(MOTOR_PWM_PORT, GPIO_PinSource15, GPIO_AF_TIM4);
 
@@ -83,7 +109,16 @@ void init_motor(void){
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+	/* initial value */
 	TIM_OCInitStructure.TIM_Pulse = SpeedValue;//in this case(duty cycle:50%)
+
+	//PWM1 Mode Configuration: TIM4 Channel3 (MOTOR_LEFT_CV_PIN)
+	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
+	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+	//PWM1 Mode Configuration: TIM4 Channel3 (MOTOR_RIGHT_CV_PIN)
+	TIM_OC2Init(TIM4, &TIM_OCInitStructure);
+	TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
+
 	//PWM1 Mode Configuration: TIM4 Channel3 (MOTOR_LEFT_PWM_PIN)
 	TIM_OC3Init(TIM4, &TIM_OCInitStructure);
 	TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
