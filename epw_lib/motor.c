@@ -14,6 +14,11 @@
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
+void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
+	TIM_SetCompare3(TIM4, SpeedValue_left);
+	TIM_SetCompare4(TIM4, SpeedValue_right);
+}
+
 void init_motor(void){
 	init_switch();
 	init_motorPWM();
@@ -127,9 +132,4 @@ void init_motorPWM(void){
 	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
 	TIM_Cmd(TIM4, ENABLE);
-}
-
-void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
-	TIM_SetCompare3(TIM4, SpeedValue_left);
-	TIM_SetCompare4(TIM4, SpeedValue_right);
 }
