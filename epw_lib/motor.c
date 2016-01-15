@@ -14,19 +14,23 @@
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
+/* Motor Power Switch */
 void mPowerON(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_SET);
 }
-
 void mPowerOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_RESET);
 }
 
+/* Enable the control signal pins. You have to enable this before sending
+ * PWM value for motor control (MOVE) */
 void mSwitchON(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_SET);
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_SET);
 }
 
+/* Switch to the constant voltage between 2.5V~3V
+ * and keep motor in idle state (STATIC/STOP)*/
 void mSwitchOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_RESET);
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_RESET);
