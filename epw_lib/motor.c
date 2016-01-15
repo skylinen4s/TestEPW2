@@ -14,6 +14,24 @@
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
+void mPowerON(){
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_SET);
+}
+
+void mPowerOFF(){
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_RESET);
+}
+
+void mSwitchON(){
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_SET);
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_SET);
+}
+
+void mSwitchOFF(){
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_RESET);
+	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_RESET);
+}
+
 void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
 	TIM_SetCompare3(TIM4, SpeedValue_left);
 	TIM_SetCompare4(TIM4, SpeedValue_right);

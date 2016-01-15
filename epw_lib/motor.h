@@ -20,10 +20,15 @@
 #define MOTOR_LEFT_PWM_PIN			GPIO_Pin_14 //Red  TIM4_CH3
 #define MOTOR_RIGHT_PWM_PIN			GPIO_Pin_15 //Blue TIM4_CH4
 
+
+extern void mPowerON(void);
+extern void mPowerOFF(void);
+extern void mSwitchON(void);
+extern void mSwitchOFF(void);
+extern void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
+extern void init_motor(void);
 void init_switch(void);
 void init_motorPWM(void);
-extern void init_motor(void);
-extern void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
 
 #endif 
 /* __MOTOR_H__ */
