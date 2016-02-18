@@ -52,8 +52,37 @@ void init_encoder_exti(void){
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
+
+	/* connect EXTI Line2 to PA2 pin */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource2);
+	EXTI_InitStruct.EXTI_Line = EXTI_Line1;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStruct);
+	EXTI_ClearITPendingBit(EXTI_Line1);
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
+	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStruct);
+
+	/* connect EXTI Line3 to PA3 pin */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource3);
+	EXTI_InitStruct.EXTI_Line = EXTI_Line1;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStruct);
+	EXTI_ClearITPendingBit(EXTI_Line1);
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
+	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStruct);
 }
 
+/* ENCODER LEFT phase A */
 void EXTI0_IRQHandler(){
 	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
 		encoder_left_counter++;
@@ -61,10 +90,27 @@ void EXTI0_IRQHandler(){
 	}
 }
 
+/* ENCODER RIGHT phase A */
 void EXTI1_IRQHandler(){
 	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
 		encoder_right_counter++;
 		EXTI_ClearITPendingBit(EXTI_Line1);
+	}
+}
+
+/* ENCODER LEFT phase B */
+void EXTI2_IRQHandler(){
+	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
+		encoder_left_counter++;
+		EXTI_ClearITPendingBit(EXTI_Line2);
+	}
+}
+
+/* ENCODER RIGHT phase B */
+void EXTI3_IRQHandler(){
+	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
+		encoder_right_counter++;
+		EXTI_ClearITPendingBit(EXTI_Line3);
 	}
 }
 
@@ -83,6 +129,8 @@ void attachEXTI(uint32_t EXTI_LineX){
 void getEncoder(void){
 	detachEXTI(EXTI_Line0);
 	detachEXTI(EXTI_Line1);
+	detachEXTI(EXTI_Line2);
+	detachEXTI(EXTI_Line3);
 
 	USART_puts(USART3, "le_en:");
 	USART_putd(USART3, encoder_left_counter);
@@ -96,4 +144,6 @@ void getEncoder(void){
 
 	attachEXTI(EXTI_Line0);
 	attachEXTI(EXTI_Line1);
+	attachEXTI(EXTI_Line2);
+	attachEXTI(EXTI_Line3);
 }
