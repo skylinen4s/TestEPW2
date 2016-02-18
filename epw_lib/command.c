@@ -58,6 +58,15 @@ void receive_task(){
 				    set_linearActuator_B_cmd(LINEAR_ACTU_CCW);
 				    USART_puts(USART3, "\r\n");
 				}
+			}else if(received_string[0] == 'a'){
+				mPowerON();
+			}else if(received_string[0] == 'A'){
+				mPowerOFF();
+			}else if(received_string[0] == 'b'){
+				mSwitchON();
+			}else if(received_string[0] == 'B'){
+				mSwitchOFF();
+
 			}else{
 				USART_puts(USART3, received_string);
 				USART_puts(USART3, "\r\n");

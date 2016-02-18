@@ -8,18 +8,20 @@
 #include "motor.h"
 #include "uart.h"
 
-#define TimPeriod 256
-#define TimPrescaler 32
-#define SpeedValue 124 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
+#define TimPeriod 1200
+#define TimPrescaler 7
+#define SpeedValue 590 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
 /* Motor Power Switch */
 void mPowerON(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_SET);
+	mSwitchON();
 }
 void mPowerOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_RESET);
+	mSwitchOFF();
 }
 
 /* Enable the control signal pins. You have to enable this before sending
@@ -34,6 +36,15 @@ void mSwitchON(){
 void mSwitchOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_RESET);
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_RESET);
+	mReset();
+}
+
+/* Reset PWM value to initial setting */
+void mReset(){
+	SpeedValue_left = SpeedValue;
+	SpeedValue_right = SpeedValue;
+	TIM_SetCompare3(TIM4, SpeedValue);
+	TIM_SetCompare4(TIM4, SpeedValue);
 }
 
 void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
@@ -139,10 +150,10 @@ void init_motorPWM(void){
 	/* initial value */
 	TIM_OCInitStructure.TIM_Pulse = SpeedValue;//in this case(duty cycle:50%)
 
-	//PWM1 Mode Configuration: TIM4 Channel3 (MOTOR_LEFT_CV_PIN)
+	//PWM1 Mode Configuration: TIM4 Channel1 (MOTOR_LEFT_CV_PIN)
 	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
 	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
-	//PWM1 Mode Configuration: TIM4 Channel3 (MOTOR_RIGHT_CV_PIN)
+	//PWM1 Mode Configuration: TIM4 Channel2 (MOTOR_RIGHT_CV_PIN)
 	TIM_OC2Init(TIM4, &TIM_OCInitStructure);
 	TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
