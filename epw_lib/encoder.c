@@ -29,7 +29,7 @@ void init_encoder_exti(void){
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
 	EXTI_InitStruct.EXTI_Line = EXTI_Line0;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
 	EXTI_ClearITPendingBit(EXTI_Line0);
@@ -43,7 +43,7 @@ void init_encoder_exti(void){
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource1);
 	EXTI_InitStruct.EXTI_Line = EXTI_Line1;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
 	EXTI_ClearITPendingBit(EXTI_Line1);
@@ -57,7 +57,7 @@ void init_encoder_exti(void){
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource2);
 	EXTI_InitStruct.EXTI_Line = EXTI_Line2;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
 	EXTI_ClearITPendingBit(EXTI_Line2);
@@ -71,7 +71,7 @@ void init_encoder_exti(void){
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource3);
 	EXTI_InitStruct.EXTI_Line = EXTI_Line3;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
 	EXTI_ClearITPendingBit(EXTI_Line3);
