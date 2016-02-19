@@ -55,13 +55,13 @@ void init_encoder_exti(void){
 
 	/* connect EXTI Line2 to PA2 pin */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource2);
-	EXTI_InitStruct.EXTI_Line = EXTI_Line1;
+	EXTI_InitStruct.EXTI_Line = EXTI_Line2;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
-	EXTI_ClearITPendingBit(EXTI_Line1);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
+	EXTI_ClearITPendingBit(EXTI_Line2);
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI2_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
@@ -69,13 +69,13 @@ void init_encoder_exti(void){
 
 	/* connect EXTI Line3 to PA3 pin */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource3);
-	EXTI_InitStruct.EXTI_Line = EXTI_Line1;
+	EXTI_InitStruct.EXTI_Line = EXTI_Line3;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
-	EXTI_ClearITPendingBit(EXTI_Line1);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
+	EXTI_ClearITPendingBit(EXTI_Line3);
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI3_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
@@ -100,7 +100,7 @@ void EXTI1_IRQHandler(){
 
 /* ENCODER LEFT phase B */
 void EXTI2_IRQHandler(){
-	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
+	if(EXTI_GetITStatus(EXTI_Line2) != RESET){
 		encoder_left_counter++;
 		EXTI_ClearITPendingBit(EXTI_Line2);
 	}
@@ -108,7 +108,7 @@ void EXTI2_IRQHandler(){
 
 /* ENCODER RIGHT phase B */
 void EXTI3_IRQHandler(){
-	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
+	if(EXTI_GetITStatus(EXTI_Line3) != RESET){
 		encoder_right_counter++;
 		EXTI_ClearITPendingBit(EXTI_Line3);
 	}
