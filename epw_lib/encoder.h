@@ -11,6 +11,20 @@
 #define ENCODER_LEFT_B_PIN	GPIO_Pin_2
 #define ENCODER_RIGHT_B_PIN	GPIO_Pin_3
 
+typedef enum {
+	STOP,
+	CW,
+	CCW
+}Rotate_t;
+
+typedef struct {
+	int count;
+	uint8_t state;
+	Rotate_t roatation;
+	uint16_t phaseA;
+	uint16_t phaseB;
+}Encoder_t;
+
 void init_encoder(void);
 void init_encoder_exti(void);
 

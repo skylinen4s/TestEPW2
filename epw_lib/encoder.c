@@ -1,7 +1,7 @@
 #include "encoder.h"
 
-int encoder_left_counter = 0;
-int encoder_right_counter = 0;
+Encoder_t ENCODER_L;
+Encoder_t ENCODER_R;
 
 /* initialize the encoder */
 void init_encoder(void){
@@ -16,9 +16,13 @@ void init_encoder(void){
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(ENCODER_PORT, &GPIO_InitStruct);
+
+	ENCODER_L.phaseA = ENCODER_LEFT_A_PIN;
+	ENCODER_L.phaseB = ENCODER_LEFT_B_PIN;
+	ENCODER_R.phaseA = ENCODER_RIGHT_A_PIN;
+	ENCODER_R.phaseB = ENCODER_RIGHT_B_PIN;
 }
 
-/* connect the encoders' phase A to Interrupt */
 void init_encoder_exti(void){
 	EXTI_InitTypeDef EXTI_InitStruct;
 	NVIC_InitTypeDef NVIC_InitStruct;
@@ -82,10 +86,15 @@ void init_encoder_exti(void){
 	NVIC_Init(&NVIC_InitStruct);
 }
 
+static void getEncoderState(Encoder_t* encoder){
+	encoder->state = (encoder->state << 2 & 0x0f) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseA) << 1) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseB));
+}
+
 /* ENCODER LEFT phase A */
 void EXTI0_IRQHandler(){
 	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
-		encoder_left_counter++;
+		ENCODER_L.count++;
+		getEncoderState(&ENCODER_L);
 		EXTI_ClearITPendingBit(EXTI_Line0);
 	}
 }
@@ -93,7 +102,8 @@ void EXTI0_IRQHandler(){
 /* ENCODER RIGHT phase A */
 void EXTI1_IRQHandler(){
 	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
-		encoder_right_counter++;
+		ENCODER_R.count++;
+		getEncoderState(&ENCODER_R);
 		EXTI_ClearITPendingBit(EXTI_Line1);
 	}
 }
@@ -101,7 +111,8 @@ void EXTI1_IRQHandler(){
 /* ENCODER LEFT phase B */
 void EXTI2_IRQHandler(){
 	if(EXTI_GetITStatus(EXTI_Line2) != RESET){
-		encoder_left_counter++;
+		ENCODER_L.count++;
+		getEncoderState(&ENCODER_L);
 		EXTI_ClearITPendingBit(EXTI_Line2);
 	}
 }
@@ -109,7 +120,8 @@ void EXTI2_IRQHandler(){
 /* ENCODER RIGHT phase B */
 void EXTI3_IRQHandler(){
 	if(EXTI_GetITStatus(EXTI_Line3) != RESET){
-		encoder_right_counter++;
+		ENCODER_R.count++;
+		getEncoderState(&ENCODER_R);
 		EXTI_ClearITPendingBit(EXTI_Line3);
 	}
 }
@@ -132,15 +144,24 @@ void getEncoder(void){
 	detachEXTI(EXTI_Line2);
 	detachEXTI(EXTI_Line3);
 
+	USART_puts(USART3, "L_state:");
+	USART_putd(USART3, ENCODER_L.state);
+
+	getEncoderState(&ENCODER_L);
+	getEncoderState(&ENCODER_R);
+	USART_puts(USART3, " L_state stop:");
+	USART_putd(USART3, ENCODER_L.state);
+	USART_puts(USART3, "\r\n");
+
 	USART_puts(USART3, "le_en:");
-	USART_putd(USART3, encoder_left_counter);
+	USART_putd(USART3, ENCODER_L.count);
 	USART_puts(USART3, " ri_en:");
-	USART_putd(USART3, encoder_right_counter);
+	USART_putd(USART3, ENCODER_R.count);
 	USART_puts(USART3, "\r\n");
 
 	/* clear encoder counter*/
-	encoder_left_counter = 0;
-	encoder_right_counter = 0;
+	ENCODER_L.count = 0;
+	ENCODER_R.count = 0;
 
 	attachEXTI(EXTI_Line0);
 	attachEXTI(EXTI_Line1);
