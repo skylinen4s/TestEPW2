@@ -57,7 +57,6 @@ void initialize()
     /* Enable USART interrupt */
     //USART3_Interrupt();
     init_encoder();
-    init_encoder_exti();
     init_linear_actuator();
     
     USART_puts(USART3,"test sdio/fat \n\r");

@@ -21,73 +21,32 @@ void init_encoder(void){
 	ENCODER_L.phaseB = ENCODER_LEFT_B_PIN;
 	ENCODER_R.phaseA = ENCODER_RIGHT_A_PIN;
 	ENCODER_R.phaseB = ENCODER_RIGHT_B_PIN;
+
+	init_encoder_exti(EXTI_PinSource0, EXTI0_IRQn, EXTI_Line0);
+	init_encoder_exti(EXTI_PinSource1, EXTI1_IRQn, EXTI_Line1);
+	init_encoder_exti(EXTI_PinSource2, EXTI2_IRQn, EXTI_Line2);
+	init_encoder_exti(EXTI_PinSource3, EXTI3_IRQn, EXTI_Line3);
 }
 
-void init_encoder_exti(void){
+void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX){
 	EXTI_InitTypeDef EXTI_InitStruct;
 	NVIC_InitTypeDef NVIC_InitStruct;
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-	/* connect EXTI Line0 to PA0 pin */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
-	EXTI_InitStruct.EXTI_Line = EXTI_Line0;
+	/* connect EXTI LineX to PAx pin (x = 0,1,2,3)*/
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinX);
+	EXTI_InitStruct.EXTI_Line = EXTI_LineX;
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
-	EXTI_ClearITPendingBit(EXTI_Line0);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI0_IRQn;
+	EXTI_ClearITPendingBit(EXTI_LineX);
+	NVIC_InitStruct.NVIC_IRQChannel = EXTIx_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
-
-	/* connect EXTI Line1 to PA1 pin */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource1);
-	EXTI_InitStruct.EXTI_Line = EXTI_Line1;
-	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStruct);
-	EXTI_ClearITPendingBit(EXTI_Line1);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
-	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStruct);
-
-	/* connect EXTI Line2 to PA2 pin */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource2);
-	EXTI_InitStruct.EXTI_Line = EXTI_Line2;
-	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStruct);
-	EXTI_ClearITPendingBit(EXTI_Line2);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI2_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
-	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStruct);
-
-	/* connect EXTI Line3 to PA3 pin */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource3);
-	EXTI_InitStruct.EXTI_Line = EXTI_Line3;
-	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStruct);
-	EXTI_ClearITPendingBit(EXTI_Line3);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI3_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
-	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStruct);
-}
-
-static void getEncoderState(Encoder_t* encoder){
-	encoder->state = (encoder->state << 2 & 0x0f) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseA) << 1) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseB));
 }
 
 /* ENCODER LEFT phase A */
@@ -138,11 +97,13 @@ void attachEXTI(uint32_t EXTI_LineX){
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 }
 
+static void getEncoderState(Encoder_t* encoder){
+	encoder->state = (encoder->state << 2 & 0x0f) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseA) << 1) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseB));
+}
+
+
 void getEncoder(void){
-	detachEXTI(EXTI_Line0);
-	detachEXTI(EXTI_Line1);
-	detachEXTI(EXTI_Line2);
-	detachEXTI(EXTI_Line3);
+	detachEXTI(EXTI_Line0 | EXTI_Line1 | EXTI_Line2 | EXTI_Line3);
 
 	USART_puts(USART3, "L_state:");
 	USART_putd(USART3, ENCODER_L.state);
@@ -163,8 +124,5 @@ void getEncoder(void){
 	ENCODER_L.count = 0;
 	ENCODER_R.count = 0;
 
-	attachEXTI(EXTI_Line0);
-	attachEXTI(EXTI_Line1);
-	attachEXTI(EXTI_Line2);
-	attachEXTI(EXTI_Line3);
+	attachEXTI(EXTI_Line0 | EXTI_Line1 | EXTI_Line2 | EXTI_Line3);
 }

@@ -26,13 +26,15 @@ typedef struct {
 }Encoder_t;
 
 void init_encoder(void);
-void init_encoder_exti(void);
-
+void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX);
 void EXTI0_IRQHandler();
 void EXTI1_IRQHandler();
 void EXTI2_IRQHandler();
 void EXTI3_IRQHandler();
 void detachEXTI(uint32_t EXTI_LineX);
 void attachEXTI(uint32_t EXTI_LineX);
+
+static void getEncoderState(Encoder_t* encoder);
 void getEncoder(void);
+
 #endif /* __ENCODER_H__ */
