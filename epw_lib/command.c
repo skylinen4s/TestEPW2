@@ -21,7 +21,7 @@ void receive_task(){
 			if(received_string[0] == '+'){
 				SpeedValue_left += inc;
 				SpeedValue_right += inc;
-				testMotor(SpeedValue_left,SpeedValue_right);
+				mMove(SpeedValue_left,SpeedValue_right);
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);
 				USART_puts(USART3, " right:");
@@ -30,7 +30,7 @@ void receive_task(){
 			}else if(received_string[0] == '-'){
 				SpeedValue_left -= inc;
 				SpeedValue_right -= inc;
-				testMotor(SpeedValue_left,SpeedValue_right);
+				mMove(SpeedValue_left,SpeedValue_right);
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);
 				USART_puts(USART3, " right:");

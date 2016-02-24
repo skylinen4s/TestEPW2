@@ -47,7 +47,7 @@ void mReset(){
 	TIM_SetCompare4(TIM4, SpeedValue);
 }
 
-void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
+void mMove(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
 	TIM_SetCompare3(TIM4, SpeedValue_left);
 	TIM_SetCompare4(TIM4, SpeedValue_right);
 }
