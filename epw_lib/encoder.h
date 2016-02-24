@@ -3,6 +3,7 @@
 
 #include "stm32f4xx_gpio.h"
 #include "FreeRTOS.h"
+#include "timers.h"
 
 #define ENCODER_PORT 		GPIOA
 
@@ -24,7 +25,7 @@ typedef struct {
 	uint16_t phaseA;
 	uint16_t phaseB;
 }Encoder_t;
-
+void Encoder_Polling();
 void init_encoder(void);
 void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX);
 void EXTI0_IRQHandler();

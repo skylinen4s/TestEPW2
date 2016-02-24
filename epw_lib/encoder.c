@@ -3,6 +3,12 @@
 Encoder_t ENCODER_L;
 Encoder_t ENCODER_R;
 
+xTimerHandle EncoderTimer;
+#define ENCODER_PERIOD 1000 //ms
+void Encoder_Polling(){
+	getEncoder();
+}
+
 /* initialize the encoder */
 void init_encoder(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -26,6 +32,10 @@ void init_encoder(void){
 	init_encoder_exti(EXTI_PinSource1, EXTI1_IRQn, EXTI_Line1);
 	init_encoder_exti(EXTI_PinSource2, EXTI2_IRQn, EXTI_Line2);
 	init_encoder_exti(EXTI_PinSource3, EXTI3_IRQn, EXTI_Line3);
+
+	/* get encoder data every period */
+	EncoderTimer = xTimerCreate("Encoder Polling", (ENCODER_PERIOD), pdTRUE, (void *) 1, Encoder_Polling);
+	xTimerStart(EncoderTimer, 0);
 }
 
 void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX){
