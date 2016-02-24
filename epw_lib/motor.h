@@ -21,12 +21,12 @@
 #define MOTOR_RIGHT_PWM_PIN			GPIO_Pin_15 //Blue TIM4_CH4
 
 
-extern void mPowerON(void);
-extern void mPowerOFF(void);
-extern void mSwitchON(void);
-extern void mSwitchOFF(void);
-extern void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
-extern void init_motor(void);
+void mPowerON(void);
+void mPowerOFF(void);
+void mSwitchON(void);
+void mSwitchOFF(void);
+void testMotor(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
+void init_motor(void);
 void init_switch(void);
 void init_motorPWM(void);
 
