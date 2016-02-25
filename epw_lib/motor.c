@@ -10,7 +10,7 @@
 
 #define TimPeriod 1200
 #define TimPrescaler 7
-#define SpeedValue 590 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
+#define SpeedValue 600 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
@@ -36,11 +36,11 @@ void mSwitchON(){
 void mSwitchOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_RESET);
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_RESET);
-	mReset();
+	mStop();
 }
 
-/* Reset PWM value to initial setting */
-void mReset(){
+/* STOP: Reset PWM value to initial setting */
+void mStop(){
 	SpeedValue_left = SpeedValue;
 	SpeedValue_right = SpeedValue;
 	TIM_SetCompare3(TIM4, SpeedValue);
@@ -50,6 +50,20 @@ void mReset(){
 void mMove(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
 	TIM_SetCompare3(TIM4, SpeedValue_left);
 	TIM_SetCompare4(TIM4, SpeedValue_right);
+}
+
+void mForward(){
+	mMove(620, 620);
+}
+
+void mBackward(){
+	mMove(580, 580);
+}
+
+void mLeft(){
+}
+
+void mRight(){
 }
 
 void init_motor(void){

@@ -25,7 +25,13 @@ void mPowerON(void);
 void mPowerOFF(void);
 void mSwitchON(void);
 void mSwitchOFF(void);
+void mStop(void);
 void mMove(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
+void mForward(void);
+void mBackward(void);
+void mLeft(void);
+void mRight(void);
+
 void init_motor(void);
 void init_switch(void);
 void init_motorPWM(void);
