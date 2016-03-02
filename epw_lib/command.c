@@ -66,6 +66,8 @@ void receive_task(){
 				mSwitchON();
 			}else if(received_string[0] == 'B'){
 				mSwitchOFF();
+			}else if(received_string[0] == 'c'){
+				getCurData();
 
 			}else{
 				USART_puts(USART3, received_string);

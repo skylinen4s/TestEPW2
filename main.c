@@ -58,6 +58,8 @@ void initialize()
     //USART3_Interrupt();
     init_encoder();
     init_linear_actuator();
+
+    init_CurTransducer();
     
     USART_puts(USART3,"test sdio/fat \n\r");
     //SDIO_test();
