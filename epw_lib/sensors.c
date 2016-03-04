@@ -85,7 +85,7 @@ static void init_CurADC(){
 	ADC_CommonInitStruct.ADC_Prescaler = ADC_Prescaler_Div4; //f = 84/4=21MHz
 	ADC_CommonInitStruct.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
 	ADC_CommonInitStruct.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
-	ADC_CommonInit(&ADC_InitStruct);
+	ADC_CommonInit(&ADC_CommonInitStruct);
 
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 1, ADC_SampleTime_15Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 2, ADC_SampleTime_15Cycles);
