@@ -13,6 +13,8 @@
 /* current of right motor */
 #define CUR_RIGHT_PIN			GPIO_Pin_5
 
+void cCurAll(void);
+void cCurMotor(void);
 void getCurData(void);
 void init_CurTransducer(void);
 static void init_CurADC(void);

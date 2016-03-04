@@ -3,14 +3,49 @@
 #define CUR_TRANS_SIZE		3
 uint16_t CurValue[CUR_TRANS_SIZE];
 
-void getCurData(){
+void cCurAll(){
+	float all = (float)CurValue[0];
+	all = 5-2*3*(all/4096);
+	all*=1000;
+
 	USART_puts(USART3, "ALL:");
 	USART_putd(USART3, CurValue[0]);
-	USART_puts(USART3, " Left:");
-	USART_putd(USART3, CurValue[1]);
-	USART_puts(USART3, " Right:");
-	USART_putd(USART3, CurValue[2]);
+	USART_puts(USART3, " (v):");
+	USART_putd(USART3, (uint32_t)all);
+	USART_puts(USART3, " (a):");
+	USART_putd(USART3, (uint32_t)(all*5));
 	USART_puts(USART3, "\r\n");
+}
+
+void cCurMotor(){
+	float left = (float)CurValue[1];
+	float right = (float)CurValue[2];
+	left = left*3/4; //Vall = (ADCvalue / 4096)*3(V)*1000(mV)
+	right = right*3/4;
+
+
+	USART_puts(USART3, "Left:");
+	USART_putd(USART3, CurValue[1]);
+	USART_puts(USART3, " (v):");
+	USART_putd(USART3, (uint32_t)left);
+	USART_puts(USART3, " (a):");
+	left*=2.5; // component: HX-10P 1V=2.5A
+	USART_putd(USART3, (uint32_t)left);
+	USART_puts(USART3, "\r\n");
+
+	USART_puts(USART3, "Right:");
+	USART_putd(USART3, CurValue[2]);
+	USART_puts(USART3, " (v):");
+	USART_putd(USART3, (uint32_t)right);
+	USART_puts(USART3, " (a:");
+	right*=2.5;
+	USART_putd(USART3, (uint32_t)right);
+	USART_puts(USART3, "\r\n");
+}
+
+void getCurData(){
+	cCurAll();
+	cCurMotor();
 }
 
 void init_CurTransducer(){
