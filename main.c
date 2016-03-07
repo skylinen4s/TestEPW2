@@ -13,10 +13,7 @@
 #include "motor.h"
 #include "linear_actuator.h"
 
-/* SDIO_libs */
-#include "ff.h"
-#include "fftest.h"
-#include "sdio_debug.h"
+#include "record.h"
 
 void write()
 { 
@@ -62,8 +59,10 @@ void initialize()
     
     USART_puts(USART3,"test sdio/fat \n\r");
     //SDIO_test();
-    ff_test();
-    ff_read();
+    //ff_test();
+    //ff_read();
+    start_record();
+    record();
     USART_puts(USART3,"test end \n\r");
 }
 
