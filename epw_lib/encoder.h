@@ -13,18 +13,34 @@
 #define ENCODER_RIGHT_B_PIN	GPIO_Pin_3
 
 typedef enum {
+	EPW_IDLE,
+	EPW_STOP,
+	EPW_FORWARD,
+	EPW_BACKWARD,
+	EPW_LEFT,
+	EPW_RIGHT
+}State_t;
+
+/* encdoer state list */
+typedef enum {
 	STOP,
 	CW,
-	CCW
-}Rotate_t;
+	CCW,
+	ERR
+};
+static uint8_t encoder_states[] = {	STOP, CW, CCW, ERR, \
+									CCW, STOP, ERR, CW, \
+									CW,	ERR, STOP, CCW, \
+									ERR, CCW, CW, STOP }; 
 
 typedef struct {
 	int count;
-	uint8_t state;
-	Rotate_t roatation;
 	uint16_t phaseA;
 	uint16_t phaseB;
+	uint8_t state;
+	uint8_t rotate;
 }Encoder_t;
+
 void Encoder_Polling();
 void init_encoder(void);
 void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX);
