@@ -1,22 +1,22 @@
 #include "stm32f4xx.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "math.h"
-#include "stdio.h"
 #include "stm32f4xx_usart.h"
 #include "stm32f4xx_gpio.h"
-//#include "stm32f4xx_conf.h"
-//#include "stm32f4_discovery.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+
+#include "math.h"
+#include "stdio.h"
+
+/* EPW_libs */
 #include "uart.h"
 #include "motor.h"
-//#include "transfer.h"
+#include "linear_actuator.h"
+
+/* SDIO_libs */
 #include "ff.h"
 #include "fftest.h"
-#include "linear_actuator.h"
 #include "sdio_debug.h"
-
-void init_UserButton(void);
-void init_LED(void);
 
 void write()
 { 
@@ -50,8 +50,7 @@ void initialize()
     init_USART3(9600);
     USART_puts(USART3,"initial...\n\r");
     USART_puts(USART3,"USART is ready\n\r");
-    //init_UserButton();
-    init_LED();
+
     init_motor();
     USART_puts(USART3,"motor is ready \n\r");
     /* Enable USART interrupt */
@@ -121,67 +120,3 @@ void vApplicationStackOverflowHook(xTaskHandle pxTask, signed char *pcTaskName) 
     taskDISABLE_INTERRUPTS();
     for(;;);
 }
-/*
-void init_UserButton(void)
-{
-    GPIO_InitTypeDef GPIO_InitStruct;
-    EXTI_InitTypeDef EXTI_InitStruct;
-    NVIC_InitTypeDef NVIC_InitStruct;
-
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-
-    GPIO_InitStruct.GPIO_Pin =  GPIO_Pin_0;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init( GPIOA, &GPIO_InitStruct );
-
-    EXTI_InitStruct.EXTI_Line = EXTI_Line0;
-    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
-    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&EXTI_InitStruct);
-
-    NVIC_InitStruct.NVIC_IRQChannel = EXTI0_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStruct);
-}*/
-
-void init_LED(void)
-{
-    GPIO_InitTypeDef GPIO_InitStruct;
-    /* Enable GPIO D clock. */
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-
-    // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
-    GPIO_InitStruct.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; //PD12->LED3 PD13->LED4 PD14->LED5 PDa5->LED6
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init( GPIOD, &GPIO_InitStruct ); 
-
-    GPIO_WriteBit(GPIOD,GPIO_Pin_12,Bit_RESET);//Green
-    GPIO_WriteBit(GPIOD,GPIO_Pin_13,Bit_RESET);//Orange
-    GPIO_WriteBit(GPIOD,GPIO_Pin_14,Bit_RESET);//Red
-    GPIO_WriteBit(GPIOD,GPIO_Pin_15,Bit_RESET);//Blue
-}
-
-#if 0
-void EXTI0_IRQHandler(void)
-{ 
-    if (EXTI_GetFlagStatus(EXTI_Line0) == SET)
-    {
-    GPIO_SetBits(GPIOD,GPIO_Pin_15);
-    riseUp(NO);
-    }
-
-    //GPIO_ResetBits(GPIOD,GPIO_Pin_15);
-    //USART3_Printf("UserButton\n\r");
-    // Clear the EXTI line pending bit //
-    EXTI_ClearITPendingBit(EXTI_Line0);
-}
-#endif
