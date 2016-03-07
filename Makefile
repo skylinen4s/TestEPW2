@@ -19,7 +19,6 @@ INCLUDE+=-I$(CURDIR)/Libraries/CMSIS/Device/ST/STM32F4xx/Include
 INCLUDE+=-I$(CURDIR)/Libraries/CMSIS/Include
 INCLUDE+=-I$(CURDIR)/Libraries/STM32F4-Discovery
 INCLUDE+=-I$(CURDIR)/Libraries/STM32F4xx_StdPeriph_Driver/inc
-INCLUDE+=-I$(CURDIR)/Libraries/servo_motor
 INCLUDE+=-I$(CURDIR)/Libraries/usart
 INCLUDE+=-I$(CURDIR)/config
 INCLUDE+=-I$(CURDIR)/epw_lib
@@ -33,7 +32,6 @@ BIN_DIR = $(CURDIR)/binary
 # of the same directory as their source files
 vpath %.c $(CURDIR)/Libraries/STM32F4xx_StdPeriph_Driver/src \
 	  $(CURDIR)/Libraries/STM32F4-Discovery \
-	  $(CURDIR)/Libraries/servo_motor \
 	  $(CURDIR)/Libraries/usart \
 	  $(CURDIR)/Libraries/syscall $(CURDIR)/hardware $(FREERTOS) \
 	  $(FREERTOS)/portable/MemMang $(FREERTOS)/portable/GCC/ARM_CM4F \
@@ -52,13 +50,6 @@ SRC+=syscalls.c
 
 # STM32F4-Discovery
 SRC+=stm32f4_discovery.c
-
-#-----Self-Defined-----
-# Servo Motor
-SRC+=servo_motor.c
-# Usart
-#SRC+=usart.c
-#----------------------
 
 # EPW libraries
 #SRC+=transfer.c
