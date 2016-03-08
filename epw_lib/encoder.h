@@ -41,6 +41,9 @@ typedef struct {
 	uint8_t rotate;
 }Encoder_t;
 
+extern Encoder_t ENCODER_L;
+extern Encoder_t ENCODER_R;
+
 void Encoder_Polling();
 void init_encoder(void);
 void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX);

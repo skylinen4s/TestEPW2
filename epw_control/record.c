@@ -2,6 +2,7 @@
 #include "ff.h"
 #include "record.h"
 #include "uart.h"
+#include "encoder.h"
 
 FATFS fatfs;
 FIL file, file2;
@@ -14,8 +15,11 @@ xTimerHandle RecordTimer;
 
 extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
+extern Encoder_t ENCODER_L;
+extern Encoder_t ENCODER_R;
 
 uint32_t speed[2];
+uint32_t encoder[2];
 
 void start_record(){
     SD_NVIC_Configuration();
@@ -49,7 +53,12 @@ void record(){
 void pwmrecord(){
     speed[0] = SpeedValue_left;
     speed[1] = SpeedValue_right;
-    if(&file) res = f_write(&file, speed, sizeof(speed), &bw);
+    encoder[0] = ENCODER_L.count;
+    encoder[1] = ENCODER_R.count;
+    if(&file){
+        res = f_write(&file, speed, sizeof(speed), &bw);
+        res = f_write(&file, encoder, sizeof(encoder), &bw);
+    }
     res = f_sync(&file);
 }
 
