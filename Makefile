@@ -65,6 +65,7 @@ SRC+=sensors.c
 
 # epw control
 SRC+=record.c
+SRC+=control.c
 
 # sdio
 SRC+=sdio_debug.c

@@ -2,6 +2,8 @@
 #ifndef __MOTOR_H__
 #define __MOTOR_H__
 
+#include "stm32f4xx.h"
+
 /* Define all pins of the motor of EPW2 */
 #define MOTOR_PWM_PORT				GPIOD
 

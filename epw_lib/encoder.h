@@ -44,7 +44,7 @@ typedef struct {
 extern Encoder_t ENCODER_L;
 extern Encoder_t ENCODER_R;
 
-void Encoder_Polling();
+void resetEncoder(Encoder_t* encoder);
 void init_encoder(void);
 void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX);
 void EXTI0_IRQHandler();

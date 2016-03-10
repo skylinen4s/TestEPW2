@@ -7,9 +7,6 @@ State_t EPW_STATE;
 
 xTimerHandle EncoderTimer;
 #define ENCODER_PERIOD 1000 //ms
-void Encoder_Polling(){
-	getEncoder();
-}
 
 void resetEncoder(Encoder_t* encoder){
 	encoder->count = 0;

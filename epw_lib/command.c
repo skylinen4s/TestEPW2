@@ -5,6 +5,7 @@
 #include "command.h"
 #include "motor.h"
 #include "linear_actuator.h"
+#include "control.h"
 /*parse*/
 #include "string.h"
 
@@ -69,6 +70,13 @@ void receive_task(){
 			}else if(received_string[0] == 'c'){
 				getCurData();
 
+			}else if(received_string[0] == 'f'){
+				forward();
+				USART_puts(USART3, "left:");
+				USART_putd(USART3, SpeedValue_left);
+				USART_puts(USART3, " right:");
+				USART_putd(USART3, SpeedValue_right);
+				USART_puts(USART3, "\r\n");
 			}else{
 				USART_puts(USART3, received_string);
 				USART_puts(USART3, "\r\n");
