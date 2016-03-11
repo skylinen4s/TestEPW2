@@ -9,6 +9,7 @@
 #include "uart.h"
 
 void getData(void);
+void test_forward(void);
 void forward(void);
 
 #endif

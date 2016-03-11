@@ -71,7 +71,7 @@ void receive_task(){
 				getCurData();
 
 			}else if(received_string[0] == 'f'){
-				forward();
+				test_forward();
 				USART_puts(USART3, "left:");
 				USART_putd(USART3, SpeedValue_left);
 				USART_puts(USART3, " right:");
