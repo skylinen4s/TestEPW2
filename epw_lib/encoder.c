@@ -3,16 +3,8 @@
 Encoder_t ENCODER_L;
 Encoder_t ENCODER_R;
 
-State_t EPW_STATE;
-
 xTimerHandle EncoderTimer;
 #define ENCODER_PERIOD 1000 //ms
-
-void resetEncoder(Encoder_t* encoder){
-	encoder->count = 0;
-	encoder->state &= ~0xff;
-	encoder->rotate = STOP;
-}
 
 /* initialize the encoder */
 void init_encoder(void){
@@ -114,27 +106,58 @@ void attachEXTI(uint32_t EXTI_LineX){
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 }
 
-State_t getEPWState(State_t epw_state, Encoder_t* encoder_L, Encoder_t* encoder_R){
+/* initialize & reset the value of all parameters */
+void resetEncoder(Encoder_t* encoder){
+	encoder->count = 0;
+	encoder->state &= ~0xff;
+	encoder->rotate = STOP;
+}
+
+/* read the pins of encoder, combine with the past value  *
+ * and then identify the rotate direction of the encoders */
+static void getEncoderState(Encoder_t* encoder){
+	encoder->state = (encoder->state << 2 & 0x0f) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseA) << 1) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseB));
+	encoder->rotate = encoder_states[encoder->state & 0x0f];
+}
+
+/* identify the current status of EPW with the 'rotate' value read from two encoders */
+State_t getState(Encoder_t* encoder_L, Encoder_t* encoder_R){
+	State_t epw_state;
 	if((encoder_L->rotate == STOP) && (encoder_R->rotate == STOP)) epw_state = EPW_STOP;
 	else if((encoder_L->rotate == CCW) && (encoder_R->rotate == CW)) epw_state = EPW_FORWARD;
 	else if((encoder_L->rotate == CW) && (encoder_R->rotate == CCW)) epw_state = EPW_BACKWARD;
 	else if((encoder_L->rotate == CW) && (encoder_R->rotate == CW)) epw_state = EPW_LEFT;
 	else if((encoder_L->rotate == CCW) && (encoder_R->rotate == CCW)) epw_state = EPW_RIGHT;
+	else epw_state = EPW_ERROR;
 
 	return epw_state;
 }
 
-static void getEncoderState(Encoder_t* encoder){
-	encoder->state = (encoder->state << 2 & 0x0f) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseA) << 1) | (GPIO_ReadInputDataBit(ENCODER_PORT, encoder->phaseB));
-	encoder->rotate = encoder_states[encoder->state & 0x0f];
-	/*if(encoder->state == (0x00 || 0x05 || 0x0a || 0x0f )) encoder->rotate = ENCODER_STOP;
-	else if(encoder->state == (0x01 || 0x07 || 0x08 || 0x0e )) encoder->rotate = ENCODER_CW;
-	else if(encoder->state == (0x02 || 0x04 || 0x0b || 0x0d )) encoder->rotate = ENCODER_CCW;
-	else encoder->rotate = ENCODER_ERR;*/
-
-	EPW_STATE = getEPWState(EPW_STATE, &ENCODER_L, &ENCODER_R);
+/* for general use */
+State_t getEPWState(){
+	State_t state = getState(&ENCODER_L, &ENCODER_R);
+	return state;
 }
 
+/* get left encoder count value */
+int getEncoderLeft(){
+	detachEXTI(EXTI_Line0 | EXTI_Line2);
+	int left_cnt = ENCODER_L.count;
+	resetEncoder(&ENCODER_L);
+	attachEXTI(EXTI_Line0 | EXTI_Line2);
+	return left_cnt;
+}
+
+/* get right encoder count value */
+int getEncoderRight(){
+	detachEXTI(EXTI_Line1 | EXTI_Line3);
+	int right_cnt = ENCODER_R.count;
+	resetEncoder(&ENCODER_R);
+	attachEXTI(EXTI_Line1 | EXTI_Line3);
+	return right_cnt;
+}
+
+/* test use for printing the status and counter value through usart */
 void getEncoder(void){
 	detachEXTI(EXTI_Line0 | EXTI_Line1 | EXTI_Line2 | EXTI_Line3);
 
@@ -144,10 +167,6 @@ void getEncoder(void){
 	USART_puts(USART3, " R_state:");
 	USART_putd(USART3, ENCODER_R.rotate);
 
-	USART_puts(USART3, " state:");
-	USART_putd(USART3, EPW_STATE);
-	USART_puts(USART3, "\r\n");
-
 	getEncoderState(&ENCODER_L);
 	getEncoderState(&ENCODER_R);
 
@@ -155,9 +174,6 @@ void getEncoder(void){
 	USART_putd(USART3, ENCODER_L.rotate);
 	USART_puts(USART3, " R_state2:");
 	USART_putd(USART3, ENCODER_R.rotate);
-	USART_puts(USART3, " state:");
-	USART_putd(USART3, EPW_STATE);
-	USART_puts(USART3, "\r\n");
 
 	USART_puts(USART3, "le_en:");
 	USART_putd(USART3, ENCODER_L.count);

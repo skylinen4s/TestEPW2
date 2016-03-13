@@ -18,11 +18,14 @@ typedef enum {
 	EPW_FORWARD,
 	EPW_BACKWARD,
 	EPW_LEFT,
-	EPW_RIGHT
+	EPW_RIGHT,
+	EPW_UNREADY,
+	EPW_BUSY,
+	EPW_ERROR
 }State_t;
 
 /* encdoer state list */
-typedef enum {
+enum {
 	STOP,
 	CW,
 	CCW,
@@ -44,7 +47,6 @@ typedef struct {
 extern Encoder_t ENCODER_L;
 extern Encoder_t ENCODER_R;
 
-void resetEncoder(Encoder_t* encoder);
 void init_encoder(void);
 void init_encoder_exti(uint8_t EXTI_PinX, uint8_t EXTIx_IRQn, uint32_t EXTI_LineX);
 void EXTI0_IRQHandler();
@@ -54,7 +56,13 @@ void EXTI3_IRQHandler();
 void detachEXTI(uint32_t EXTI_LineX);
 void attachEXTI(uint32_t EXTI_LineX);
 
+void resetEncoder(Encoder_t* encoder);
+
 static void getEncoderState(Encoder_t* encoder);
+State_t getState(Encoder_t* encoder_L, Encoder_t* encoder_R);
+State_t getEPWState(void);
+int getEncoderLeft(void);
+int getEncoderRight(void);
 void getEncoder(void);
 
 #endif /* __ENCODER_H__ */
