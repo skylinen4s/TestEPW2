@@ -12,6 +12,39 @@ extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
 uint32_t cmd_cnt = 0;
 
+State_t EPW_State = EPW_UNREADY;
+
+void checkState(){
+	if(EPW_State == EPW_IDLE){
+		/* accept all epw command */
+	}
+	else if(EPW_State == EPW_STOP){
+		/* check epw status and return to IDLE */
+	}
+	else if(EPW_State == EPW_FORWARD){
+		/* forward */
+	}
+	else if(EPW_State == EPW_BACKWARD){
+		/* backward */
+	}
+	else if(EPW_State == EPW_LEFT){
+		/* turn left */
+	}
+	else if(EPW_State == EPW_RIGHT){
+		/* turn right*/
+	}
+	else if(EPW_State == EPW_UNREADY){
+		/* after PowerOn, check the status of motors and test motor */
+	}
+	else if(EPW_State == EPW_BUSY){
+		/* use linear actuator would be in this state */
+	}
+	else if(EPW_State == EPW_ERROR){
+		/* something wrong */
+	}
+
+}
+
 void test_forward(){
 	ctrlTimer = xTimerCreate("encoder Polling", (Period), pdTRUE, (void *) 1, forward);
 	xTimerStart(ctrlTimer, 0);
