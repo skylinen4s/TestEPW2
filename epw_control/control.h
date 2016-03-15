@@ -1,14 +1,15 @@
 #ifndef __CONTROL_H__
 #define __CONTROL_H__
 
-#include "motor.h"
-#include "encoder.h"
+#include "stm32f4xx.h"
 #include "FreeRTOS.h"
 #include "timers.h"
 
+/* include EPW LIB. */
+#include "motor.h"
+#include "encoder.h"
 #include "uart.h"
 
-void getData(void);
 void test_forward(void);
 void forward(void);
 
