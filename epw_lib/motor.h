@@ -4,6 +4,12 @@
 
 #include "stm32f4xx.h"
 
+enum {
+	mLeft,
+	mRight,
+	mBoth
+};
+
 /* Define all pins of the motor of EPW2 */
 #define MOTOR_PWM_PORT				GPIOD
 
@@ -27,12 +33,8 @@ void mPowerON(void);
 void mPowerOFF(void);
 void mSwitchON(void);
 void mSwitchOFF(void);
-void mStop(void);
+void mStop(uint8_t mstop);
 void mMove(uint32_t SpeedValue_left, uint32_t SpeedValue_right);
-void mForward(void);
-void mBackward(void);
-void mLeft(void);
-void mRight(void);
 
 void init_motor(void);
 void init_switch(void);

@@ -10,7 +10,7 @@
 
 #define TimPeriod 1200
 #define TimPrescaler 7
-#define SpeedValue 600 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
+#define SpeedValue 595 //SpeedValue = TimPeriod * duty cycle (1200*0.5)
 uint32_t SpeedValue_left = SpeedValue;
 uint32_t SpeedValue_right = SpeedValue;
 
@@ -36,34 +36,26 @@ void mSwitchON(){
 void mSwitchOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_LEFT_SW_PIN, Bit_RESET);
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RIGHT_SW_PIN, Bit_RESET);
-	mStop();
+	mStop(mBoth);
 }
 
-/* STOP: Reset PWM value to initial setting */
-void mStop(){
-	SpeedValue_left = SpeedValue;
-	SpeedValue_right = SpeedValue;
-	TIM_SetCompare3(TIM4, SpeedValue);
-	TIM_SetCompare4(TIM4, SpeedValue);
+/* STOP: Reset PWM value to initial setting
+ * EX:mStop(1,0) to stop left motor
+ *    mStop(1,1) to stop both motors */
+void mStop(uint8_t mstop){
+	if((mstop == mLeft) || (mstop == mBoth)){
+		SpeedValue_left = SpeedValue;
+		TIM_SetCompare3(TIM4, SpeedValue);
+	}
+	if((mstop == mRight) || (mstop == mBoth)){
+		SpeedValue_right = SpeedValue;
+		TIM_SetCompare4(TIM4, SpeedValue);
+	}
 }
 
 void mMove(uint32_t SpeedValue_left, uint32_t SpeedValue_right){
 	TIM_SetCompare3(TIM4, SpeedValue_left);
 	TIM_SetCompare4(TIM4, SpeedValue_right);
-}
-
-void mForward(){
-	mMove(620, 620);
-}
-
-void mBackward(){
-	mMove(580, 580);
-}
-
-void mLeft(){
-}
-
-void mRight(){
 }
 
 void init_motor(void){
