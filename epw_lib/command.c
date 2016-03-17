@@ -77,6 +77,8 @@ void receive_task(){
 				USART_puts(USART3, " right:");
 				USART_putd(USART3, SpeedValue_right);
 				USART_puts(USART3, "\r\n");
+			}else if(received_string[0] == 't'){
+				check();
 			}else{
 				USART_puts(USART3, received_string);
 				USART_puts(USART3, "\r\n");

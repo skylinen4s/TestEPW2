@@ -11,6 +11,7 @@ extern Encoder_t ENCODER_R;
 extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
 uint32_t cmd_cnt = 0;
+uint32_t fl, fr;
 
 State_t EPW_State = EPW_UNREADY;
 
@@ -43,6 +44,41 @@ void checkState(){
 		/* something wrong */
 	}
 
+}
+void check(){
+	fl = 0;
+	fr = 0;
+	ctrlTimer = xTimerCreate("motor checking", (200), pdTRUE, (void *)6, checkMotor);
+	xTimerStart(ctrlTimer, 0);
+}
+
+void checkMotor(){
+	int enc_cnt[2] = {0, 0};
+	if(!fl){
+		++SpeedValue_left;
+		mMove(SpeedValue_left, SpeedValue_right);
+		enc_cnt[0] = getEncoderLeft();
+	}
+	if(enc_cnt[0]){
+		fl = SpeedValue_left;
+		mStop(mLeft);
+	}
+
+	if(!fr){
+		++SpeedValue_right;
+		mMove(SpeedValue_left, SpeedValue_right);
+		enc_cnt[1] = getEncoderRight();
+	}
+
+	if(enc_cnt[1]){
+		fr = SpeedValue_right;
+		mStop(mRight);
+	}
+
+	if(fl && fr){
+		mStop(mBoth);
+		xTimerDelete(ctrlTimer, 0);
+	}
 }
 
 void test_forward(){
