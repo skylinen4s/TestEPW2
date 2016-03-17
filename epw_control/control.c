@@ -46,8 +46,14 @@ void checkState(){
 }
 
 void test_forward(){
-	ctrlTimer = xTimerCreate("encoder Polling", (Period), pdTRUE, (void *) 1, forward);
-	xTimerStart(ctrlTimer, 0);
+	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
+		ctrlTimer = xTimerCreate("forward control", (Period), pdTRUE, (void *) 1, forward);
+		xTimerStart(ctrlTimer, 0);
+	}
+	else{
+		cmd_cnt = 0;
+		xTimerReset(ctrlTimer, 0);
+	}
 }
 
 void forward(){
