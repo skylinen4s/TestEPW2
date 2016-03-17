@@ -65,7 +65,7 @@ void forward(){
 
 	mMove(SpeedValue_left, SpeedValue_right);
 	if(cmd_cnt > cmd_times){
-		mStop();
+		mStop(mBoth);
 		xTimerStop(ctrlTimer, 0);
 		cmd_cnt = 0;
 	}
