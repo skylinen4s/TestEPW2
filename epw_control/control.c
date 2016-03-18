@@ -48,36 +48,48 @@ void checkState(){
 void check(){
 	fl = 0;
 	fr = 0;
-	ctrlTimer = xTimerCreate("motor checking", (200), pdTRUE, (void *)6, checkMotor);
+	cmd_cnt = 30;
+	ctrlTimer = xTimerCreate("motor checking", (75), pdTRUE, (void *)6, checkMotor);
 	xTimerStart(ctrlTimer, 0);
 }
 
 void checkMotor(){
-	int enc_cnt[2] = {0, 0};
 	if(!fl){
-		++SpeedValue_left;
-		mMove(SpeedValue_left, SpeedValue_right);
-		enc_cnt[0] = getEncoderLeft();
+		if(!getEncoderLeft()){
+			++SpeedValue_left;
+			mMove(SpeedValue_left, SpeedValue_right);
+		}
+		else{
+			fl = SpeedValue_left;
+			mStop(mLeft);
+		}
 	}
-	if(enc_cnt[0]){
-		fl = SpeedValue_left;
-		mStop(mLeft);
-	}
-
 	if(!fr){
-		++SpeedValue_right;
-		mMove(SpeedValue_left, SpeedValue_right);
-		enc_cnt[1] = getEncoderRight();
-	}
-
-	if(enc_cnt[1]){
-		fr = SpeedValue_right;
-		mStop(mRight);
+		if(!getEncoderRight()){
+			++SpeedValue_right;
+			mMove(SpeedValue_left, SpeedValue_right);
+		}
+		else{
+			fr = SpeedValue_right;
+			mStop(mRight);
+		}
 	}
 
 	if(fl && fr){
-		mStop(mBoth);
+			mStop(mBoth);
+			xTimerDelete(ctrlTimer, 0);
+
+			USART_puts(USART3, "cmd_cnt:");
+			USART_putd(USART3, cmd_cnt);
+			USART_puts(USART3, " l:");
+			USART_putd(USART3, fl);
+			USART_puts(USART3, " r:");
+			USART_putd(USART3, fr);
+	}
+
+	if(!(--cmd_cnt)){
 		xTimerDelete(ctrlTimer, 0);
+		USART_puts(USART3, "EPW_UNREADY\r\n");
 	}
 }
 
