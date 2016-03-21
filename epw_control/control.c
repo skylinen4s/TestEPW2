@@ -13,7 +13,7 @@ extern uint32_t SpeedValue_right;
 uint32_t cmd_cnt = 0;
 uint32_t fl, fr;
 
-State_t EPW_State = EPW_UNREADY;
+State_t EPW_State = EPW_NOTRDY;
 
 void checkState(){
 	if(EPW_State == EPW_IDLE){
@@ -34,7 +34,7 @@ void checkState(){
 	else if(EPW_State == EPW_RIGHT){
 		/* turn right*/
 	}
-	else if(EPW_State == EPW_UNREADY){
+	else if(EPW_State == EPW_NOTRDY){
 		/* after PowerOn, check the status of motors and test motor */
 	}
 	else if(EPW_State == EPW_BUSY){
@@ -89,7 +89,7 @@ void checkMotor(){
 
 	if(!(--cmd_cnt)){
 		xTimerDelete(ctrlTimer, 0);
-		USART_puts(USART3, "EPW_UNREADY\r\n");
+		USART_puts(USART3, "EPW_NOT_READY\r\n");
 	}
 }
 

@@ -19,7 +19,7 @@ typedef enum {
 	EPW_BACKWARD,
 	EPW_LEFT,
 	EPW_RIGHT,
-	EPW_UNREADY,
+	EPW_NOTRDY,
 	EPW_BUSY,
 	EPW_ERROR
 }State_t;
