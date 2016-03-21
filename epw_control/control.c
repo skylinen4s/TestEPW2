@@ -94,12 +94,13 @@ void checkMotor(){
 }
 
 void test_forward(){
+	cmd_cnt = 50;
+
 	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
 		ctrlTimer = xTimerCreate("forward control", (Period), pdTRUE, (void *) 1, forward);
 		xTimerStart(ctrlTimer, 0);
 	}
 	else{
-		cmd_cnt = 0;
 		xTimerReset(ctrlTimer, 0);
 	}
 }
@@ -109,18 +110,31 @@ void forward(){
 	cnt[0] = getEncoderLeft();
 	cnt[1] = getEncoderRight();
 
-	if(cnt[0] || cnt[1]) ++cmd_cnt;
+	if(cmd_cnt){
+		/* start counting only if encoder get data(motor moving)
+		 * moving period = cmd_cnt * Period */
+		if(cnt[0] || cnt[1]) --cmd_cnt;
+		SpeedValue_left += (cnt[0] < 100)?1:-1;
+		SpeedValue_right += (cnt[0] < 100)?1:-1;
 
-	if(cnt[0] < 100) SpeedValue_left++;
-	else if(cnt[0] > 100) SpeedValue_left--;
-	
-	if(cnt[1] < 100) SpeedValue_right++;
-	else if(cnt[1] > 100) SpeedValue_right--;
-
-	mMove(SpeedValue_left, SpeedValue_right);
-	if(cmd_cnt > cmd_times){
-		mStop(mBoth);
-		xTimerStop(ctrlTimer, 0);
-		cmd_cnt = 0;
+		mMove(SpeedValue_left, SpeedValue_right);
 	}
+	else{
+		mStop(mBoth);
+		if(!(cnt[0] || cnt[1])){
+			xTimerDelete(ctrlTimer, 0);
+		}
+	}
+
+	USART_puts(USART3, "fl:");
+	USART_putd(USART3, SpeedValue_left);
+	USART_puts(USART3, " fr:");
+	USART_putd(USART3, SpeedValue_right);
+	USART_puts(USART3, "\r\nel:");
+	USART_putd(USART3, cnt[0]);
+	USART_puts(USART3, " rl:");
+	USART_putd(USART3, cnt[1]);
+	USART_puts(USART3, "\r\n");
+
+	//record data(left_pwm, right_pwm, cnt[0], cnt[1]);
 }
