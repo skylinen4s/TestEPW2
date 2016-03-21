@@ -136,5 +136,5 @@ void forward(){
 	USART_putd(USART3, cnt[1]);
 	USART_puts(USART3, "\r\n");
 
-	//record data(left_pwm, right_pwm, cnt[0], cnt[1]);
+	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }

@@ -10,6 +10,7 @@
 
 void start_record(void);
 void close_record(void);
+void recControlData(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R);
 void record(void);
 void pwmrecord(void);
 FRESULT ff_test(void);

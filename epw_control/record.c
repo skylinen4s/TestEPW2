@@ -45,6 +45,13 @@ void close_record(){
     if(res == FR_OK) printf("file closed!");   
 }
 
+void recControlData(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R){
+    if(&file){
+        res = f_printf(&file, "%d %d %d %d\r\n", pwm_L, pwm_R, enc_L, enc_R);
+    }
+    res = f_sync(&file);
+}
+
 void record(){
     RecordTimer = xTimerCreate("Data Record Polling", (RECORD_PERIOD), pdTRUE, (void *) 1, pwmrecord);
     xTimerStart(RecordTimer, 0);

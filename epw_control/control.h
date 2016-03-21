@@ -9,6 +9,7 @@
 #include "motor.h"
 #include "encoder.h"
 #include "uart.h"
+#include "record.h"
 
 void check(void);
 void checkMotor(void);
