@@ -5,7 +5,7 @@
 #include "encoder.h"
 
 FATFS fatfs;
-FIL file, file2;
+FIL file, file2, f_value;
 BYTE buff[20] = "test write\n\r";
 UINT bw, br;
 FRESULT res;
@@ -30,6 +30,8 @@ void start_record(){
 
     /* open file to write data */
     res = f_open(&file, "data.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+    res = f_open(&f_value, "pwm.val", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+
     if(res != FR_OK) printf("open file failed: %d\n\r", res);
 
     if(res == FR_OK) printf("file is ready to write data!");
@@ -42,7 +44,24 @@ void close_record(){
     res = f_mount(NULL, "", 0);
     if(res != FR_OK) printf("umonut failed: %d\n\r", res);
 
-    if(res == FR_OK) printf("file closed!");   
+    if(res == FR_OK) printf("file closed!");
+}
+
+void writeControlValue(uint32_t pwm_L, uint32_t pwm_R){
+    if(&f_value){
+        res = f_write(&f_value, &pwm_L, sizeof(uint32_t), &bw);
+        res = f_write(&f_value, &pwm_R, sizeof(uint32_t), &bw);
+    }
+    res = f_sync(&f_value);
+}
+
+uint32_t readControlValue(){
+    uint32_t pwm_value = 595;
+    if(&f_value){
+        res = f_read(&f_value, pwm_value, sizeof(uint32_t), &br);
+        return pwm_value;
+    }
+    return pwm_value;
 }
 
 void recControlData(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R){
