@@ -30,7 +30,7 @@ void start_record(){
 
     /* open file to write data */
     res = f_open(&file, "data.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
-    res = f_open(&f_value, "pwm.val", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+    res = f_open(&f_value, "pwm.val", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 
     if(res != FR_OK) printf("open file failed: %d\n\r", res);
 
