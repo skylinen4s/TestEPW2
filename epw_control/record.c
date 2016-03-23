@@ -58,7 +58,7 @@ void writeControlValue(uint32_t pwm_L, uint32_t pwm_R){
 uint32_t readControlValue(){
     uint32_t pwm_value = 595;
     if(&f_value){
-        res = f_read(&f_value, pwm_value, sizeof(uint32_t), &br);
+        res = f_read(&f_value, &pwm_value, sizeof(uint32_t), &br);
         return pwm_value;
     }
     return pwm_value;
