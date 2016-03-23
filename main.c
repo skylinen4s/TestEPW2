@@ -43,26 +43,24 @@ static void servo_test(void *pvParameters)
 }
 
 void initialize()
-{ 
+{
+    /* ---------communication-------- */
     init_USART3(9600);
     USART_puts(USART3,"initial...\n\r");
     USART_puts(USART3,"USART is ready\n\r");
 
+    /* ------------motors------------ */
     init_motor();
-    USART_puts(USART3,"motor is ready \n\r");
-    /* Enable USART interrupt */
-    //USART3_Interrupt();
-    init_encoder();
     init_linear_actuator();
+    USART_puts(USART3,"motor is ready \n\r");
 
+    /* ------------sensor------------ */
+    init_encoder();
     init_CurTransducer();
     
+    /* -----------SD(data)----------- */
     USART_puts(USART3,"test sdio/fat \n\r");
-    //SDIO_test();
-    //ff_test();
-    //ff_read();
     start_record();
-    record();
     USART_puts(USART3,"test end \n\r");
 }
 
