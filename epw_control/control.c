@@ -93,8 +93,15 @@ void checkMotor(){
 	}
 }
 
+uint32_t mvl, mvr;
+
 void test_forward(){
 	cmd_cnt = 50;
+
+	if(mvl && mvr){
+		SpeedValue_left = mvl;
+		SpeedValue_right = mvr;
+	}
 
 	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
 		ctrlTimer = xTimerCreate("forward control", (Period), pdTRUE, (void *) 1, forward);
@@ -114,10 +121,13 @@ void forward(){
 		/* start counting only if encoder get data(motor moving)
 		 * moving period = cmd_cnt * Period */
 		if(cnt[0] || cnt[1]) --cmd_cnt;
-		SpeedValue_left += (cnt[0] < 100)?1:-1;
-		SpeedValue_right += (cnt[0] < 100)?1:-1;
+		SpeedValue_left += (cnt[0] < 90)? 1: (cnt[0] > 100)? -1: 0;
+		SpeedValue_right += (cnt[1] < 90)? 1: (cnt[1] > 100)? -1: 0;
 
 		mMove(SpeedValue_left, SpeedValue_right);
+		/* record the value for next forward command */
+		mvl = SpeedValue_left;
+		mvr = SpeedValue_right;
 	}
 	else{
 		mStop(mBoth);
