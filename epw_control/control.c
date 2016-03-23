@@ -79,6 +79,7 @@ void checkMotor(){
 			mStop(mBoth);
 			xTimerDelete(ctrlTimer, 0);
 
+			EPW_State = EPW_IDLE;
 			USART_puts(USART3, "cmd_cnt:");
 			USART_putd(USART3, cmd_cnt);
 			USART_puts(USART3, " l:");
@@ -89,6 +90,7 @@ void checkMotor(){
 
 	if(!(--cmd_cnt)){
 		xTimerDelete(ctrlTimer, 0);
+		EPW_State = EPW_NOTRDY;
 		USART_puts(USART3, "EPW_NOT_READY\r\n");
 	}
 }
