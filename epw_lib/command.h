@@ -11,10 +11,11 @@ extern uint8_t Receive_String_Ready;
 
 extern void receive_task();
 
-static struct receive_cmd_list{
-	volatile unsigned char Identifier[3];
-	volatile unsigned char DIR_cmd;
-	volatile unsigned char pwm_value;
+static struct RECEIVE_CMD{
+	volatile unsigned char _start;
+	volatile unsigned char cmd_id;
+	volatile unsigned char cmd_value;
+	volatile unsigned char _end;
 };
 
 #endif /* __COMMAND_H__ */

@@ -13,13 +13,28 @@ extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
 uint32_t inc = 1;
 
-struct receive_cmd_list * receive_cmd_type;
+struct RECEIVE_CMD *cmd_raw;
 
 
 #if USER_MODE
 void receive_task(){
+
+	USART_puts(USART3, "user mode test\r\n");
 	if(Receive_String_Ready){
-		USART_puts(USART3, "user mode test\r\n");
+		cmd_raw = received_string;
+		USART_puts(USART3, cmd_raw);
+		USART_puts(USART3, "\r\n");
+
+		if(cmd_raw->_start == 'c' && cmd_raw->_end == 'e'){
+			USART_puts(USART3, "id:");
+			USART_putd(USART3, cmd_raw->cmd_id);
+
+			USART_puts(USART3, " value:");
+			USART_putd(USART3, cmd_raw->cmd_value);
+			USART_puts(USART3, "\r\n");
+
+			//do_something(cmd_id, cmd_value)
+		}
 	}
 }
 #endif
