@@ -15,6 +15,15 @@ uint32_t inc = 1;
 
 struct receive_cmd_list * receive_cmd_type;
 
+
+#if USER_MODE
+void receive_task(){
+	if(Receive_String_Ready){
+		USART_puts(USART3, "user mode test\r\n");
+	}
+}
+#endif
+
 #if DEBUG_MODE
 void receive_task(){
 	if(Receive_String_Ready){
