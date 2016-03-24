@@ -4,6 +4,8 @@
 #define __COMMAND_H__
 #include "stm32f4xx.h"
 
+#define DEBUG_MODE		1
+
 extern uint8_t Receive_String_Ready;
 
 extern void receive_task();

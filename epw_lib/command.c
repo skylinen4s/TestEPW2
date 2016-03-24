@@ -15,6 +15,7 @@ uint32_t inc = 1;
 
 struct receive_cmd_list * receive_cmd_type;
 
+#if DEBUG_MODE
 void receive_task(){
 	if(Receive_String_Ready){
 		if(received_string[0] == '+'){
@@ -95,3 +96,4 @@ void receive_task(){
 		}
 	}
 }
+#endif
