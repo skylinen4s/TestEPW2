@@ -72,35 +72,24 @@ void processCMD(uint8_t id, uint8_t value){
 }
 
 void checkState(){
-	if(EPW_State == EPW_IDLE){
-		/* accept all epw command */
+	switch(CMD_State)
+	{
+		case EPW_IDLE:
+			break;
+		case EPW_STOP:
+		case EPW_FORWARD:
+		case EPW_BACKWARD:
+		case EPW_LEFT:
+		case EPW_RIGHT:
+			EPW_State = getEPWState();
+			break;
+		case EPW_NOTRDY:
+		case EPW_BUSY:
+		case EPW_ERROR:
+			break;
 	}
-	else if(EPW_State == EPW_STOP){
-		/* check epw status and return to IDLE */
-	}
-	else if(EPW_State == EPW_FORWARD){
-		/* forward */
-	}
-	else if(EPW_State == EPW_BACKWARD){
-		/* backward */
-	}
-	else if(EPW_State == EPW_LEFT){
-		/* turn left */
-	}
-	else if(EPW_State == EPW_RIGHT){
-		/* turn right*/
-	}
-	else if(EPW_State == EPW_NOTRDY){
-		/* after PowerOn, check the status of motors and test motor */
-	}
-	else if(EPW_State == EPW_BUSY){
-		/* use linear actuator would be in this state */
-	}
-	else if(EPW_State == EPW_ERROR){
-		/* something wrong */
-	}
-
 }
+
 void check(){
 	fl = 0;
 	fr = 0;
