@@ -15,6 +15,49 @@ uint32_t fl, fr;
 
 State_t EPW_State = EPW_NOTRDY;
 
+void processCMD(uint8_t id, uint8_t value){
+	USART_putd(USART3, EPW_State);
+	switch(id)
+	{
+		case CMD_STOP:
+			mStop(mBoth);
+			//PowerOFF
+			break;
+		case CMD_FORWARD:
+			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_FORWARD)){
+				test_forward();
+			}
+			USART_puts(USART3, "forward");
+			break;
+		case CMD_BACKWARD:
+			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_BACKWARD))
+			USART_puts(USART3, "back");
+			break;
+		case CMD_LEFT:
+			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_LEFT))
+			USART_puts(USART3, "left");
+			break;
+		case CMD_RIGHT:
+			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_RIGHT))
+			USART_puts(USART3, "right");
+			break;
+		case CMD_ACTU_A:
+			if(EPW_State == EPW_IDLE)
+			USART_puts(USART3, "ActuA");
+			USART_putd(USART3, value);
+			set_linearActuator_A_cmd(LINEAR_ACTU_CW);
+			break;
+		case CMD_ACTU_B:
+			if(EPW_State == EPW_IDLE)
+			USART_puts(USART3, "ActuB");
+			USART_putd(USART3, value);
+			set_linearActuator_B_cmd(LINEAR_ACTU_CW);
+			break;
+		default:
+			break;
+	}
+}
+
 void checkState(){
 	if(EPW_State == EPW_IDLE){
 		/* accept all epw command */

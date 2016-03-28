@@ -10,7 +10,19 @@
 #include "encoder.h"
 #include "uart.h"
 #include "record.h"
+#include "linear_actuator.h"
 
+typedef enum {
+	CMD_STOP = 115,
+	CMD_FORWARD = 102,
+	CMD_BACKWARD = 98,
+	CMD_LEFT = 108,
+	CMD_RIGHT = 114,
+	CMD_ACTU_A = 120,
+	CMD_ACTU_B = 121
+}CMD_STATE;
+
+void cmdProcess(uint8_t id, uint8_t value);
 void check(void);
 void checkMotor(void);
 void test_forward(void);

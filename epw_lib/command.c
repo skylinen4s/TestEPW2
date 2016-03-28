@@ -33,10 +33,11 @@ void receive_task(){
 			USART_putd(USART3, cmd_raw->cmd_value);
 			USART_puts(USART3, "\r\n");
 
-			//do_something(cmd_id, cmd_value)
+			processCMD(cmd_raw->cmd_id, cmd_raw->cmd_value);
 		}
 	}
 }
+
 #endif
 
 #if DEBUG_MODE
