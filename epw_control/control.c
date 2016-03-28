@@ -14,6 +14,7 @@ uint32_t cmd_cnt = 0;
 uint32_t fl, fr;
 
 State_t EPW_State = EPW_NOTRDY;
+State_t CMD_State;
 
 void processCMD(uint8_t id, uint8_t value){
 	USART_putd(USART3, EPW_State);
@@ -22,23 +23,35 @@ void processCMD(uint8_t id, uint8_t value){
 		case CMD_STOP:
 			mStop(mBoth);
 			//PowerOFF
+			CMD_State = EPW_STOP;
 			break;
 		case CMD_FORWARD:
-			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_FORWARD)){
+			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_FORWARD))
+			{
 				test_forward();
+				CMD_State = EPW_FORWARD;
 			}
 			USART_puts(USART3, "forward");
 			break;
 		case CMD_BACKWARD:
 			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_BACKWARD))
+			{
+				CMD_State = EPW_BACKWARD;
+			}
 			USART_puts(USART3, "back");
 			break;
 		case CMD_LEFT:
 			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_LEFT))
+			{
+				CMD_State = EPW_LEFT;
+			}
 			USART_puts(USART3, "left");
 			break;
 		case CMD_RIGHT:
 			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_RIGHT))
+			{
+				CMD_State = EPW_RIGHT;
+			}
 			USART_puts(USART3, "right");
 			break;
 		case CMD_ACTU_A:
