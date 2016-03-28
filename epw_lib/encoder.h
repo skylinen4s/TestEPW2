@@ -13,15 +13,15 @@
 #define ENCODER_RIGHT_B_PIN	GPIO_Pin_3
 
 typedef enum {
-	EPW_IDLE,
-	EPW_STOP,
-	EPW_FORWARD,
-	EPW_BACKWARD,
-	EPW_LEFT,
-	EPW_RIGHT,
-	EPW_NOTRDY,
-	EPW_BUSY,
-	EPW_ERROR
+	EPW_IDLE, 		/* accept all epw command */
+	EPW_STOP,		/* check epw status and return to IDLE */
+	EPW_FORWARD,	/* forward */
+	EPW_BACKWARD,	/* backward */
+	EPW_LEFT,		/* turn left */
+	EPW_RIGHT,		/* turn right*/
+	EPW_NOTRDY,		/* after PowerOn, check the status of motors and test motor */
+	EPW_BUSY,		/* use linear actuator would be in this state */
+	EPW_ERROR		/* something wrong */
 }State_t;
 
 /* encdoer state list */
