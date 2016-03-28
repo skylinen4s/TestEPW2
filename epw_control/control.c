@@ -164,7 +164,7 @@ void forward(){
 	cnt[0] = getEncoderLeft();
 	cnt[1] = getEncoderRight();
 
-	if(cmd_cnt){
+	if(cmd_cnt && (CMD_State != EPW_STOP)){
 		/* start counting only if encoder get data(motor moving)
 		 * moving period = cmd_cnt * Period */
 		if(cnt[0] || cnt[1]) --cmd_cnt;
