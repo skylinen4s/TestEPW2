@@ -14,6 +14,7 @@
 #include "linear_actuator.h"
 
 #include "record.h"
+#include "control.h"
 
 void write()
 { 
