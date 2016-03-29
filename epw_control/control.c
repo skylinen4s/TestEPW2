@@ -4,6 +4,7 @@
 #define Period		100 //ms
 #define cmd_times	50 //times
 xTimerHandle ctrlTimer;
+xTimerHandle stateTimer;
 
 extern Encoder_t ENCODER_L;
 extern Encoder_t ENCODER_R;
@@ -69,25 +70,24 @@ void processCMD(uint8_t id, uint8_t value){
 		default:
 			break;
 	}
+
+	if(stateTimer != NULL){
+		xTimerReset(stateTimer, 0);
+	}
+	else{
+		stateTimer = xTimerCreate("EPW state checking", (100), pdTRUE, (void *)7, checkState);
+		xTimerStart(stateTimer, 0);
+	}
 }
 
 void checkState(){
-	switch(CMD_State)
-	{
-		case EPW_IDLE:
-			break;
-		case EPW_STOP:
-		case EPW_FORWARD:
-		case EPW_BACKWARD:
-		case EPW_LEFT:
-		case EPW_RIGHT:
-			EPW_State = getEPWState();
-			break;
-		case EPW_NOTRDY:
-		case EPW_BUSY:
-		case EPW_ERROR:
-			break;
+	EPW_State = getEPWState();
+
+	if(CMD_State == EPW_STOP){
+		if(EPW_State == EPW_STOP) EPW_State = EPW_IDLE;
 	}
+
+	if(EPW_State == EPW_IDLE) xTimerStop(stateTimer, 0);
 }
 
 void check(){

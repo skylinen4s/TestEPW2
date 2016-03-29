@@ -23,6 +23,7 @@ typedef enum {
 }CMD_STATE;
 
 void cmdProcess(uint8_t id, uint8_t value);
+void checkState(void);
 void check(void);
 void checkMotor(void);
 void test_forward(void);
