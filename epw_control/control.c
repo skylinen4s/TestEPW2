@@ -3,6 +3,8 @@
 #define Vset		100
 #define Period		100 //ms
 #define cmd_times	50 //times
+
+xTimerHandle checkHandle;
 xTimerHandle ctrlTimer;
 xTimerHandle stateTimer;
 
@@ -88,6 +90,23 @@ void checkState(){
 	}
 
 	if(EPW_State == EPW_IDLE) xTimerStop(stateTimer, 0);
+}
+
+uint8_t checkcnt = 5;
+void init_check(){
+	--checkcnt;
+	if(checkcnt == 3){
+		mPowerON();
+	}
+	else if(checkcnt == 0){
+		check();
+		xTimerDelete(checkHandle, 0);
+	}
+}
+
+void initMotorCheck(){
+	checkHandle = xTimerCreate("Initial Motor Check", (500), pdTRUE, (void *)1, init_check);
+	xTimerStart(checkHandle, 0);
 }
 
 void check(){

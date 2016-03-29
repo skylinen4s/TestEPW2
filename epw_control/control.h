@@ -24,6 +24,7 @@ typedef enum {
 
 void cmdProcess(uint8_t id, uint8_t value);
 void checkState(void);
+void initMotorCheck(void);
 void check(void);
 void checkMotor(void);
 void test_forward(void);
