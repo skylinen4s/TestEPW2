@@ -178,6 +178,7 @@ void forward(){
 	}
 	else{
 		mStop(mBoth);
+		CMD_State = EPW_STOP;
 		if(!(cnt[0] || cnt[1])){
 			xTimerDelete(ctrlTimer, 0);
 		}
