@@ -24,10 +24,10 @@
  *Limit Switch
  */
 #define LS_READ_PORT              GPIOD
-#define LS_A_UPPER_PIN              GPIO_Pin_7
-#define LS_A_LOWER_PIN              GPIO_Pin_6
-#define LS_B_UPPER_PIN              GPIO_Pin_3
-#define LS_B_LOWER_PIN              GPIO_Pin_4
+#define LS_A_UPPER_PIN              GPIO_Pin_3
+#define LS_A_LOWER_PIN              GPIO_Pin_4
+#define LS_B_UPPER_PIN              GPIO_Pin_7
+#define LS_B_LOWER_PIN              GPIO_Pin_6
 
 enum{
   LINEAR_ACTU_STOP,
