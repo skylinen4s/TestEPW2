@@ -92,11 +92,14 @@ void checkState(){
 	if(EPW_State == EPW_IDLE) xTimerStop(stateTimer, 0);
 }
 
-uint8_t checkcnt = 5;
+uint8_t checkcnt = 8;
 void init_check(){
 	--checkcnt;
-	if(checkcnt == 3){
+	if(checkcnt == 5){
 		mPowerON();
+	}
+	if(checkcnt == 2){
+		mSwitchON();
 	}
 	else if(checkcnt == 0){
 		check();
