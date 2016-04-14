@@ -32,9 +32,12 @@ void start_record(){
     res = f_open(&file, "data.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
     res = f_open(&f_value, "pwm.val", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 
+	readControlValue();
+	readControlValue();
+
     if(res != FR_OK) printf("open file failed: %d\n\r", res);
 
-    if(res == FR_OK) printf("file is ready to write data!");
+    if(res == FR_OK) printf("file is ready to write data!\n\r");
 }
 
 void close_record(){
@@ -59,6 +62,8 @@ uint32_t readControlValue(){
     uint32_t pwm_value = 595;
     if(&f_value){
         res = f_read(&f_value, &pwm_value, sizeof(uint32_t), &br);
+        res = f_sync(&f_value);
+
         return pwm_value;
     }
     return pwm_value;
