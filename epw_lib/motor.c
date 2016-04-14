@@ -17,7 +17,6 @@ uint32_t SpeedValue_right = SpeedValue;
 /* Motor Power Switch */
 void mPowerON(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_SET);
-	mSwitchON();
 }
 void mPowerOFF(){
 	GPIO_WriteBit(MOTOR_PWM_PORT, MOTOR_RELAY_PIN, Bit_RESET);
