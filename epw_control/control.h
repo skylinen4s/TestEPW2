@@ -22,7 +22,7 @@ typedef enum {
 	CMD_ACTU_B = 121
 }CMD_STATE;
 
-void cmdProcess(uint8_t id, uint8_t value);
+void processCMD(uint8_t id, uint8_t value);
 void checkState(void);
 void initMotorCheck(void);
 void check(void);
