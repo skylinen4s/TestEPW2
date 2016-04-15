@@ -83,12 +83,14 @@ void receive_task(){
 		else if(received_string[0] == 'd'){
 			if(received_string[1] == 'a'){
 			    USART_puts(USART3, "Actu_A_down");
-			    set_linearActuator_A_cmd(LINEAR_ACTU_CCW);
+			    //set_linearActuator_A_cmd(LINEAR_ACTU_CCW);
 			    USART_puts(USART3, "\r\n");
+			    processCMD('x', LINEAR_ACTU_CCW);
 			}else if(received_string[1] == 'b'){
 			    USART_puts(USART3, "Actu_B_down");
-			    set_linearActuator_B_cmd(LINEAR_ACTU_CCW);
+			    //set_linearActuator_B_cmd(LINEAR_ACTU_CCW);
 			    USART_puts(USART3, "\r\n");
+			    processCMD('y', LINEAR_ACTU_CCW);
 			}
 		}
 
@@ -106,10 +108,14 @@ void receive_task(){
 		}
 		else if(received_string[0] == 'c'){
 			getCurData();
-
+		}
+		else if(received_string[0] == 's'){
+			/* stop */
+			processCMD('s', '0');
 		}
 		else if(received_string[0] == 'f'){
-			test_forward();
+			/* forward */
+			processCMD('f', '0');
 		}
 		else if(received_string[0] == 't'){
 			check();
