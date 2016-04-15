@@ -17,10 +17,16 @@ uint32_t cmd_cnt = 0;
 uint32_t fl, fr;
 
 State_t EPW_State = EPW_NOTRDY;
-State_t CMD_State;
+State_t CMD_State = EPW_IDLE;
 
 void processCMD(uint8_t id, uint8_t value){
 	USART_putd(USART3, EPW_State);
+
+	if(id == CMD_ACTU_A) set_linearActuator_A_cmd(value);
+	else if(id == CMD_ACTU_B) set_linearActuator_B_cmd(value);
+
+	/* block the command if it doesn't pass the test of motor*/
+	if(EPW_State == EPW_NOTRDY) return;
 	switch(id)
 	{
 		case CMD_STOP:
@@ -56,18 +62,6 @@ void processCMD(uint8_t id, uint8_t value){
 				CMD_State = EPW_RIGHT;
 			}
 			USART_puts(USART3, "right");
-			break;
-		case CMD_ACTU_A:
-			if(EPW_State == EPW_IDLE)
-			USART_puts(USART3, "ActuA");
-			USART_putd(USART3, value);
-			set_linearActuator_A_cmd(LINEAR_ACTU_CW);
-			break;
-		case CMD_ACTU_B:
-			if(EPW_State == EPW_IDLE)
-			USART_puts(USART3, "ActuB");
-			USART_putd(USART3, value);
-			set_linearActuator_B_cmd(LINEAR_ACTU_CW);
 			break;
 		default:
 			break;
