@@ -45,6 +45,7 @@ void processCMD(uint8_t id, uint8_t value){
 		case CMD_BACKWARD:
 			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_BACKWARD))
 			{
+				test_backward();
 				CMD_State = EPW_BACKWARD;
 			}
 			USART_puts(USART3, "back");
@@ -157,7 +158,6 @@ void checkMotor(){
 }
 
 uint32_t mvl, mvr;
-
 void test_forward(){
 	cmd_cnt = 50;
 
@@ -191,6 +191,62 @@ void forward(){
 		/* record the value for next forward command */
 		mvl = SpeedValue_left;
 		mvr = SpeedValue_right;
+	}
+	else{
+		mStop(mBoth);
+		CMD_State = EPW_STOP;
+		if(!(cnt[0] || cnt[1])){
+			xTimerDelete(ctrlTimer, 0);
+		}
+	}
+
+	USART_puts(USART3, "fl:");
+	USART_putd(USART3, SpeedValue_left);
+	USART_puts(USART3, " fr:");
+	USART_putd(USART3, SpeedValue_right);
+	USART_puts(USART3, "\r\nel:");
+	USART_putd(USART3, cnt[0]);
+	USART_puts(USART3, " rl:");
+	USART_putd(USART3, cnt[1]);
+	USART_puts(USART3, "\r\n");
+
+	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+}
+
+uint32_t bl, br;
+void test_backward(){
+	cmd_cnt = 50;
+
+	if(bl && br){
+		SpeedValue_left = bl;
+		SpeedValue_right = br;
+	}
+
+	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
+		ctrlTimer = xTimerCreate("backward control", (Period), pdTRUE, (void *) 2, backward);
+		xTimerStart(ctrlTimer, 0);
+	}
+	else{
+		xTimerReset(ctrlTimer, 0);
+	}
+}
+
+void backward(){
+	int cnt[2];
+	cnt[0] = getEncoderLeft();
+	cnt[1] = getEncoderRight();
+
+	if(cmd_cnt && (CMD_State != EPW_STOP)){
+		/* start counting only if encoder get data(motor moving)
+		 * moving period = cmd_cnt * Period */
+		if(cnt[0] || cnt[1]) --cmd_cnt;
+		SpeedValue_left -= (cnt[0] < 90)? 1: (cnt[0] > 100)? -1: 0;
+		SpeedValue_right -= (cnt[1] < 90)? 1: (cnt[1] > 100)? -1: 0;
+
+		mMove(SpeedValue_left, SpeedValue_right);
+		/* record the value for next backward command */
+		bl = SpeedValue_left;
+		br = SpeedValue_right;
 	}
 	else{
 		mStop(mBoth);
