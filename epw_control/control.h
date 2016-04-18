@@ -29,5 +29,7 @@ void check(void);
 void checkMotor(void);
 void test_forward(void);
 void forward(void);
+void test_backward(void);
+void backward(void);
 
 #endif

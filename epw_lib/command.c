@@ -100,10 +100,10 @@ void receive_task(){
 		else if(received_string[0] == 'A'){
 			mPowerOFF();
 		}
-		else if(received_string[0] == 'b'){
+		else if(received_string[0] == 'q'){
 			mSwitchON();
 		}
-		else if(received_string[0] == 'B'){
+		else if(received_string[0] == 'Q'){
 			mSwitchOFF();
 		}
 		else if(received_string[0] == 'c'){
@@ -116,6 +116,10 @@ void receive_task(){
 		else if(received_string[0] == 'f'){
 			/* forward */
 			processCMD('f', '0');
+		}
+		else if(received_string[0] == 'b'){
+			/* backward */
+			processCMD('b', '0');
 		}
 		else if(received_string[0] == 't'){
 			check();
