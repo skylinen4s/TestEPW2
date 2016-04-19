@@ -14,7 +14,7 @@ extern Encoder_t ENCODER_R;
 extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
 uint32_t cmd_cnt = 0;
-uint32_t fl, fr;
+uint32_t mvl, mvr;
 
 State_t EPW_State = EPW_NOTRDY;
 State_t CMD_State = EPW_IDLE;
@@ -108,36 +108,36 @@ void initMotorCheck(){
 }
 
 void check(){
-	fl = 0;
-	fr = 0;
+	mvl = 0;
+	mvr = 0;
 	cmd_cnt = 30;
 	ctrlTimer = xTimerCreate("motor checking", (75), pdTRUE, (void *)6, checkMotor);
 	xTimerStart(ctrlTimer, 0);
 }
 
 void checkMotor(){
-	if(!fl){
+	if(!mvl){
 		if(!getEncoderLeft()){
 			++SpeedValue_left;
 			mMove(SpeedValue_left, SpeedValue_right);
 		}
 		else{
-			fl = SpeedValue_left;
+			mvl = SpeedValue_left;
 			mStop(mLeft);
 		}
 	}
-	if(!fr){
+	if(!mvr){
 		if(!getEncoderRight()){
 			++SpeedValue_right;
 			mMove(SpeedValue_left, SpeedValue_right);
 		}
 		else{
-			fr = SpeedValue_right;
+			mvr = SpeedValue_right;
 			mStop(mRight);
 		}
 	}
 
-	if(fl && fr){
+	if(mvl && mvr){
 			mStop(mBoth);
 			xTimerDelete(ctrlTimer, 0);
 
@@ -145,9 +145,9 @@ void checkMotor(){
 			USART_puts(USART3, "cmd_cnt:");
 			USART_putd(USART3, cmd_cnt);
 			USART_puts(USART3, " l:");
-			USART_putd(USART3, fl);
+			USART_putd(USART3, mvl);
 			USART_puts(USART3, " r:");
-			USART_putd(USART3, fr);
+			USART_putd(USART3, mvr);
 	}
 
 	if(!(--cmd_cnt)){
@@ -157,13 +157,13 @@ void checkMotor(){
 	}
 }
 
-uint32_t mvl, mvr;
+uint32_t fl, fr;
 void test_forward(){
 	cmd_cnt = 50;
 
-	if(mvl && mvr){
-		SpeedValue_left = mvl;
-		SpeedValue_right = mvr;
+	if(fl && fr){
+		SpeedValue_left = fl;
+		SpeedValue_right = fr;
 	}
 
 	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
@@ -189,8 +189,8 @@ void forward(){
 
 		mMove(SpeedValue_left, SpeedValue_right);
 		/* record the value for next forward command */
-		mvl = SpeedValue_left;
-		mvr = SpeedValue_right;
+		fl = SpeedValue_left;
+		fr = SpeedValue_right;
 	}
 	else{
 		mStop(mBoth);
