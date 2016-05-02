@@ -149,7 +149,7 @@ void init_motorPWM(void){
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
 	/* PWM setting */
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 	/* initial value */
