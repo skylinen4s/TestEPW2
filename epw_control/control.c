@@ -4,7 +4,6 @@
 #define Period		100 //ms
 #define cmd_times	50 //times
 
-xTimerHandle checkHandle;
 xTimerHandle ctrlTimer;
 xTimerHandle stateTimer;
 
@@ -14,7 +13,6 @@ extern Encoder_t ENCODER_R;
 extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
 uint32_t cmd_cnt = 0;
-uint32_t mvl, mvr;
 
 State_t EPW_State = EPW_NOTRDY;
 State_t CMD_State = EPW_IDLE;
@@ -87,76 +85,6 @@ void checkState(){
 	if(EPW_State == EPW_IDLE) xTimerStop(stateTimer, 0);
 }
 
-uint8_t checkcnt = 8;
-void init_check(){
-	--checkcnt;
-	if(checkcnt == 5){
-		mPowerON();
-	}
-	if(checkcnt == 2){
-		mSwitchON();
-	}
-	else if(checkcnt == 0){
-		check();
-		xTimerDelete(checkHandle, 0);
-	}
-}
-
-void initMotorCheck(){
-	checkHandle = xTimerCreate("Initial Motor Check", (500), pdTRUE, (void *)1, init_check);
-	xTimerStart(checkHandle, 0);
-}
-
-void check(){
-	mvl = 0;
-	mvr = 0;
-	cmd_cnt = 30;
-	ctrlTimer = xTimerCreate("motor checking", (75), pdTRUE, (void *)6, checkMotor);
-	xTimerStart(ctrlTimer, 0);
-}
-
-void checkMotor(){
-	if(!mvl){
-		if(!getEncoderLeft()){
-			++SpeedValue_left;
-			mMove(SpeedValue_left, SpeedValue_right);
-		}
-		else{
-			mvl = SpeedValue_left;
-			mStop(mLeft);
-		}
-	}
-	if(!mvr){
-		if(!getEncoderRight()){
-			++SpeedValue_right;
-			mMove(SpeedValue_left, SpeedValue_right);
-		}
-		else{
-			mvr = SpeedValue_right;
-			mStop(mRight);
-		}
-	}
-
-	if(mvl && mvr){
-			mStop(mBoth);
-			xTimerDelete(ctrlTimer, 0);
-
-			EPW_State = EPW_IDLE;
-			USART_puts(USART3, "cmd_cnt:");
-			USART_putd(USART3, cmd_cnt);
-			USART_puts(USART3, " l:");
-			USART_putd(USART3, mvl);
-			USART_puts(USART3, " r:");
-			USART_putd(USART3, mvr);
-	}
-
-	if(!(--cmd_cnt)){
-		xTimerDelete(ctrlTimer, 0);
-		EPW_State = EPW_NOTRDY;
-		USART_puts(USART3, "EPW_NOT_READY\r\n");
-	}
-}
-
 uint32_t fl, fr;
 void test_forward(){
 	cmd_cnt = 50;
@@ -166,7 +94,7 @@ void test_forward(){
 		SpeedValue_right = fr;
 	}
 
-	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
+	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
 		ctrlTimer = xTimerCreate("forward control", (Period), pdTRUE, (void *) 1, forward);
 		xTimerStart(ctrlTimer, 0);
 	}
@@ -222,7 +150,7 @@ void test_backward(){
 		SpeedValue_right = br;
 	}
 
-	if(xTimerIsTimerActive(ctrlTimer) != pdTRUE){
+	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
 		ctrlTimer = xTimerCreate("backward control", (Period), pdTRUE, (void *) 2, backward);
 		xTimerStart(ctrlTimer, 0);
 	}

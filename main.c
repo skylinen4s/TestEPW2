@@ -70,7 +70,6 @@ int main(void)
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
     initialize();
-    initMotorCheck();
 
     xTaskCreate(servo_test, "servo_test", configMINIMAL_STACK_SIZE, NULL, 1, NULL );
     xTaskCreate(write, "AutoWrite", configMINIMAL_STACK_SIZE, NULL, 2, NULL );

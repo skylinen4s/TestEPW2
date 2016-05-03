@@ -121,9 +121,6 @@ void receive_task(){
 			/* backward */
 			processCMD('b', '0');
 		}
-		else if(received_string[0] == 't'){
-			check();
-		}
 
 		else{
 			USART_puts(USART3, received_string);
