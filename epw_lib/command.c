@@ -6,6 +6,7 @@
 #include "motor.h"
 #include "linear_actuator.h"
 #include "control.h"
+#include "sensors.h"
 /*parse*/
 #include "string.h"
 
@@ -120,6 +121,14 @@ void receive_task(){
 		else if(received_string[0] == 'b'){
 			/* backward */
 			processCMD('b', '0');
+		}
+		else if(received_string[0] == 't'){
+			/* check motor status */
+			char s;
+			s = getIndicator();
+			USART_puts(USART3, "status: ");
+			USART_putd(USART3, s);
+			USART_puts(USART3, "\r\n");
 		}
 
 		else{

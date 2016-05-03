@@ -58,6 +58,7 @@ void initialize()
     /* ------------sensor------------ */
     init_encoder();
     init_CurTransducer();
+    init_Indicator();
     
     /* -----------SD(data)----------- */
     USART_puts(USART3,"test sdio/fat \n\r");

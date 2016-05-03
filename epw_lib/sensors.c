@@ -118,3 +118,35 @@ static void init_CurDMA(){
 	DMA_Init(DMA2_Stream0, &DMA_InitStruct);
 	DMA_Cmd(DMA2_Stream0, ENABLE);
 }
+
+char getIndicator(void)
+{
+	char indi_state;
+	indi_state = GPIO_ReadInputDataBit(GPIOE, IND_LEFT_PIN)? 0x01 : 0x00;
+	indi_state |= GPIO_ReadInputDataBit(GPIOC, IND_RIGHT_PIN)? 0x02 : 0x00;
+	/*
+	 * 00 : all pass
+	 * 01 : left fail
+	 * 10 : right fail
+	 * 11 : all fail
+	 */
+	return indi_state;
+}
+
+void init_Indicator(void)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+
+	GPIO_InitStruct.GPIO_Pin = IND_LEFT_PIN;
+	GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+	GPIO_InitStruct.GPIO_Pin = IND_RIGHT_PIN;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+}
