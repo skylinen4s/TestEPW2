@@ -43,9 +43,10 @@ struct limit_switch_info{
 static void init_LS();
 static void init_CP();
 void init_linear_actuator();
-static void detect_LS_Polling();
 void set_linearActuator_A_cmd(int flag);
 void set_linearActuator_B_cmd(int flag);
+static void detect_LS_A();
+static void detect_LS_B();
 int get_Linear_Actuator_A_LS_State();
 int get_Linear_Actuator_B_LS_State();
 

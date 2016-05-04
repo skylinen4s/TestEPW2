@@ -23,7 +23,8 @@ static actuator_A_cnt = 0, actuator_B_cnt = 0;
  */
 
 /*Timer handle declare for detect the LS state*/
-xTimerHandle detect_LS_Timers;
+xTimerHandle detect_LS_TimerA;
+xTimerHandle detect_LS_TimerB;
 
 #define DETECT_LS_POLLING_PERIOD  50//unit : ms
 
@@ -66,11 +67,12 @@ void init_linear_actuator(){
 		init_CP();
 		init_LS();
 
-        detect_LS_Timers=xTimerCreate("Detect limit Switch state Polling",( DETECT_LS_POLLING_PERIOD), pdTRUE, ( void * ) 3,  detect_LS_Polling);
-		xTimerStart( detect_LS_Timers, 0 );
+    detect_LS_TimerA=xTimerCreate("Detect limit Switch state Polling",( DETECT_LS_POLLING_PERIOD), pdTRUE, ( void * ) 3,  detect_LS_A);
+    detect_LS_TimerB=xTimerCreate("Detect limit Switch state Polling",( DETECT_LS_POLLING_PERIOD), pdTRUE, ( void * ) 3,  detect_LS_B);
 }
 
 void set_linearActuator_A_cmd(int flag){
+     xTimerStart( detect_LS_TimerA, 0 );
      if(flag==LINEAR_ACTU_STOP){
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN1_PIN,Bit_RESET);/* 0 */
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_A_IN2_PIN,Bit_RESET);/* 0 */
@@ -89,6 +91,7 @@ void set_linearActuator_A_cmd(int flag){
 }
 
 void set_linearActuator_B_cmd(int flag){
+     xTimerStart( detect_LS_TimerB, 0 );
      if(flag==LINEAR_ACTU_STOP){
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN3_PIN,Bit_RESET);/* 0 */
          GPIO_WriteBit(ACTU_CONTROL_PORT,ACTU_B_IN4_PIN,Bit_RESET);/* 0 */
@@ -106,10 +109,11 @@ void set_linearActuator_B_cmd(int flag){
      }/* BACKWARD */
 }
 
-static void detect_LS_Polling(){    
+static void detect_LS_A(){
     /*detect actuator A LS*/
     switch(actuator_state_A){
         case ACTUATOR_STATE_IDLE:
+           xTimerStop(detect_LS_TimerA, 0);
            break;//wait the next state into.
         case ACTUATOR_STATE_MOVE_CW:
            actuator_A_cnt ++;
@@ -138,10 +142,13 @@ static void detect_LS_Polling(){
         default:
            break;
     }
-    
+}
+
+static void detect_LS_B(){
     /*detect actuator B LS*/
     switch(actuator_state_B){
        case ACTUATOR_STATE_IDLE:
+           xTimerStop(detect_LS_TimerB, 0);
            break;//wait the next command into.
        case ACTUATOR_STATE_MOVE_CW:
            actuator_B_cnt ++;
