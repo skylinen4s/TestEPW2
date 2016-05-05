@@ -14,7 +14,7 @@ extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
 uint32_t cmd_cnt = 0;
 
-State_t EPW_State = EPW_NOTRDY;
+State_t EPW_State = EPW_IDLE;
 State_t CMD_State = EPW_IDLE;
 
 void processCMD(uint8_t id, uint8_t value){
@@ -24,7 +24,8 @@ void processCMD(uint8_t id, uint8_t value){
 	else if(id == CMD_ACTU_B) set_linearActuator_B_cmd(value);
 
 	/* block the command if it doesn't pass the test of motor*/
-	if(EPW_State == EPW_NOTRDY) return;
+	//if(EPW_State == EPW_NOTRDY) return;
+
 	switch(id)
 	{
 		case CMD_STOP:
