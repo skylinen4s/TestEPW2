@@ -131,6 +131,11 @@ void receive_task(){
 			USART_puts(USART3, "\r\n");
 		}
 
+		else if(received_string[0] == 'm'){
+			/* motorTest */
+			motorTest();
+		}
+
 		else{
 			USART_puts(USART3, received_string);
 			USART_puts(USART3, "\r\n");
