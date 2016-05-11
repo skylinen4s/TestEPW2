@@ -73,6 +73,7 @@ void SD_LowLevel_Init(void)
 
   /* Configure PD.02 CMD line */
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_Init(GPIOD, &GPIO_InitStructure);
 
   /* Configure PC.12 pin: CLK pin */
