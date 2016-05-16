@@ -32,9 +32,6 @@ void start_record(){
     res = f_open(&file, "data.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
     res = f_open(&f_value, "pwm.val", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
 
-	readControlValue();
-	readControlValue();
-
     if(res != FR_OK) printf("open file failed: %d\n\r", res);
 
     if(res == FR_OK) printf("file is ready to write data!\n\r");
@@ -73,6 +70,12 @@ void recControlData(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R){
     if(&file){
         res = f_printf(&file, "%d %d %d %d\r\n", pwm_L, pwm_R, enc_L, enc_R);
     }
+    //res = f_sync(&file);
+    /* f_sync would spend some much time, making timer delayed and data error */
+}
+
+/* sync the data after all commands are over */
+void endofRecord(){
     res = f_sync(&file);
 }
 

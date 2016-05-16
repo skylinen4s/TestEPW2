@@ -200,11 +200,12 @@ void backward(){
 
 void motorTest()
 {
-	SpeedValue_left = 600;
-	SpeedValue_right = 600;
+	SpeedValue_left = 168;
+	SpeedValue_right = 168;
+	mMove(SpeedValue_left, SpeedValue_right);
 
 	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
-		ctrlTimer = xTimerCreate("backward control", (20), pdTRUE, (void *) 2, motortest);
+		ctrlTimer = xTimerCreate("backward control", (50), pdTRUE, (void *) 2, motortest);
 		xTimerStart(ctrlTimer, 0);
 	}
 	else{
@@ -219,9 +220,9 @@ static void motortest()
 	cnt[1] = getEncoderRight();
 
 	cmd_cnt++;
-	if(cmd_cnt == 250 && CMD_State != EPW_STOP){
-		SpeedValue_left += 6;
-		SpeedValue_right += 6;
+	if(cmd_cnt == 100 && CMD_State != EPW_STOP){
+		SpeedValue_left += 12;
+		SpeedValue_right += 12;
 		// increase duty cycle 0.5% every period
 		mMove(SpeedValue_left, SpeedValue_right);
 
@@ -230,7 +231,11 @@ static void motortest()
 		USART_puts(USART3, "\r\n");
 
 		cmd_cnt = 0;
-		if(SpeedValue_right > 900) xTimerDelete(ctrlTimer, 0);
+		if(SpeedValue_right > 900){
+			endofRecord();
+			mStop(mBoth);
+			xTimerDelete(ctrlTimer, 0);
+		}
 	}
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }
