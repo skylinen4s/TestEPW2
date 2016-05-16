@@ -198,21 +198,6 @@ void backward(){
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }
 
-void motorTest()
-{
-	SpeedValue_left = 168;
-	SpeedValue_right = 168;
-	mMove(SpeedValue_left, SpeedValue_right);
-
-	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
-		ctrlTimer = xTimerCreate("backward control", (50), pdTRUE, (void *) 2, motortest);
-		xTimerStart(ctrlTimer, 0);
-	}
-	else{
-		xTimerReset(ctrlTimer, 0);
-	}
-}
-
 static void motortest()
 {
 	int cnt[2];
@@ -223,7 +208,7 @@ static void motortest()
 	if(cmd_cnt == 100 && CMD_State != EPW_STOP){
 		SpeedValue_left += 12;
 		SpeedValue_right += 12;
-		// increase duty cycle 0.5% every period
+		// increase duty cycle 1% every period
 		mMove(SpeedValue_left, SpeedValue_right);
 
 		USART_puts(USART3, "value:");
@@ -238,4 +223,19 @@ static void motortest()
 		}
 	}
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+}
+
+void motorTest()
+{
+	SpeedValue_left = 168;
+	SpeedValue_right = 168;
+	mMove(SpeedValue_left, SpeedValue_right);
+
+	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
+		ctrlTimer = xTimerCreate("test motor", (50), pdTRUE, (void *) 2, motortest);
+		xTimerStart(ctrlTimer, 0);
+	}
+	else{
+		xTimerReset(ctrlTimer, 0);
+	}
 }
