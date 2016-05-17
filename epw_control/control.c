@@ -198,6 +198,9 @@ void backward(){
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }
 
+/**********************************************************
+                motor behavior test function
+ **********************************************************/
 static void motortest()
 {
 	int cnt[2];
@@ -225,14 +228,31 @@ static void motortest()
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }
 
+static void motorResp()
+{
+	int cnt[2];
+	cnt[0] = getEncoderLeft();
+	cnt[1] = getEncoderRight();
+
+	cmd_cnt++;
+	if(cmd_cnt >= 500 && CMD_State != EPW_STOP){
+		mStop(mBoth);
+		if(!(cnt[0] || cnt[1])){
+			endofRecord();
+			xTimerDelete(ctrlTimer, 0);
+		}
+	}
+	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+}
+
 void motorTest()
 {
-	SpeedValue_left = 168;
-	SpeedValue_right = 168;
+	SpeedValue_left = 720;
+	SpeedValue_right = 720;
 	mMove(SpeedValue_left, SpeedValue_right);
 
 	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
-		ctrlTimer = xTimerCreate("test motor", (50), pdTRUE, (void *) 2, motortest);
+		ctrlTimer = xTimerCreate("test motor", (50), pdTRUE, (void *) 2, motorResp);
 		xTimerStart(ctrlTimer, 0);
 	}
 	else{
