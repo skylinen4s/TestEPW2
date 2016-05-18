@@ -123,12 +123,21 @@ static void getEncoderState(Encoder_t* encoder){
 /* identify the current status of EPW with the 'rotate' value read from two encoders */
 State_t getState(Encoder_t* encoder_L, Encoder_t* encoder_R){
 	State_t epw_state;
-	if((encoder_L->rotate == STOP) && (encoder_R->rotate == STOP)) epw_state = EPW_STOP;
-	else if((encoder_L->rotate == CCW) && (encoder_R->rotate == CW)) epw_state = EPW_FORWARD;
-	else if((encoder_L->rotate == CW) && (encoder_R->rotate == CCW)) epw_state = EPW_BACKWARD;
-	else if((encoder_L->rotate == CW) && (encoder_R->rotate == CW)) epw_state = EPW_LEFT;
-	else if((encoder_L->rotate == CCW) && (encoder_R->rotate == CCW)) epw_state = EPW_RIGHT;
+	uint8_t left, right;
+
+	left = encoder_L->rotate;
+	right = encoder_R->rotate;
+
+	if((left == STOP) && (right == STOP)) epw_state = EPW_STOP;
+	else if((left == CCW) && (right == CW)) epw_state = EPW_FORWARD;
+	else if((left == CW) && (right == CCW)) epw_state = EPW_BACKWARD;
+	else if((left == CW) && (right == CW)) epw_state = EPW_LEFT;
+	else if((left == CCW) && (right == CCW)) epw_state = EPW_RIGHT;
 	else epw_state = EPW_ERROR;
+
+	/* reset encoder state */
+	encoder_L->state &= ~0xff;
+	encoder_R->state &= ~0xff;
 
 	return epw_state;
 }
@@ -143,7 +152,7 @@ State_t getEPWState(){
 int getEncoderLeft(){
 	detachEXTI(EXTI_Line0 | EXTI_Line2);
 	int left_cnt = ENCODER_L.count;
-	resetEncoder(&ENCODER_L);
+	ENCODER_L.count = 0;
 	attachEXTI(EXTI_Line0 | EXTI_Line2);
 	return left_cnt;
 }
@@ -152,7 +161,7 @@ int getEncoderLeft(){
 int getEncoderRight(){
 	detachEXTI(EXTI_Line1 | EXTI_Line3);
 	int right_cnt = ENCODER_R.count;
-	resetEncoder(&ENCODER_R);
+	ENCODER_R.count = 0;
 	attachEXTI(EXTI_Line1 | EXTI_Line3);
 	return right_cnt;
 }
