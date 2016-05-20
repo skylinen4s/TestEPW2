@@ -5,6 +5,7 @@
 #define cmd_times	50 //times
 
 xTimerHandle ctrlTimer;
+xTimerHandle testTimer;
 xTimerHandle stateTimer;
 
 extern Encoder_t ENCODER_L;
@@ -38,8 +39,8 @@ void processCMD(uint8_t id, uint8_t value){
 			{
 				test_forward();
 				CMD_State = EPW_FORWARD;
+				USART_puts(USART3, "forward");
 			}
-			USART_puts(USART3, "forward");
 			break;
 		case CMD_BACKWARD:
 			if((EPW_State == EPW_IDLE) || (EPW_State == EPW_BACKWARD))
@@ -71,19 +72,28 @@ void processCMD(uint8_t id, uint8_t value){
 		xTimerReset(stateTimer, 0);
 	}
 	else{
-		stateTimer = xTimerCreate("EPW state checking", (100), pdTRUE, (void *)7, checkState);
+		stateTimer = xTimerCreate("EPW state checking", (20), pdTRUE, (void *)7, checkState);
 		xTimerStart(stateTimer, 0);
 	}
 }
 
 void checkState(){
 	EPW_State = getEPWState();
+	USART_puts(USART3, "epw");
+	USART_putd(USART3, EPW_State);
+	USART_puts(USART3, " ");
+
 
 	if(CMD_State == EPW_STOP){
 		if(EPW_State == EPW_STOP) EPW_State = EPW_IDLE;
 	}
 
 	if(EPW_State == EPW_IDLE) xTimerStop(stateTimer, 0);
+}
+
+void motorStop(){
+	mStop(mBoth);
+	CMD_State = EPW_STOP;
 }
 
 uint32_t fl, fr;
@@ -128,7 +138,7 @@ void forward(){
 			xTimerDelete(ctrlTimer, 0);
 		}
 	}
-
+/*
 	USART_puts(USART3, "fl:");
 	USART_putd(USART3, SpeedValue_left);
 	USART_puts(USART3, " fr:");
@@ -138,7 +148,7 @@ void forward(){
 	USART_puts(USART3, " rl:");
 	USART_putd(USART3, cnt[1]);
 	USART_puts(USART3, "\r\n");
-
+*/
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }
 
@@ -245,17 +255,56 @@ static void motorResp()
 	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
 }
 
-void motorTest()
-{
-	SpeedValue_left = 720;
-	SpeedValue_right = 720;
-	mMove(SpeedValue_left, SpeedValue_right);
+PID_t pid_l;
+PID_t pid_r;
 
-	if((xTimerIsTimerActive(ctrlTimer) != pdTRUE) || (ctrlTimer == NULL)){
-		ctrlTimer = xTimerCreate("test motor", (50), pdTRUE, (void *) 2, motorResp);
-		xTimerStart(ctrlTimer, 0);
+void motorPID(){
+
+	int cnt[2];
+	cnt[0] = getEncoderLeft();
+	cnt[1] = getEncoderRight();
+
+	if(cmd_cnt && (CMD_State != EPW_STOP)){
+		--cmd_cnt;
+
+		SpeedValue_left = 600 + computePID(&pid_l, 20, cnt[0]);
+		SpeedValue_right = 600 + computePID(&pid_r, 20, cnt[1]);
+
+		mMove(SpeedValue_left,SpeedValue_right);
 	}
 	else{
-		xTimerReset(ctrlTimer, 0);
+		mStop(mBoth);
+		//CMD_State = EPW_STOP;
+		if(!(cnt[0] || cnt[1])){
+			xTimerDelete(testTimer, 0);
+			USART_puts(USART3, "delete\r\n");
+			endofRecord();
+		}
+	}
+
+	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+}
+
+void motorTest()
+{
+	SpeedValue_left = 600;
+	SpeedValue_right = 600;
+
+	CMD_State = EPW_IDLE;
+
+	init_PID(&pid_l, 12.0f, 1.0f, 0.0f);
+	init_PID(&pid_r, 12.0f, 1.0f, 0.0f);
+
+	cmd_cnt = 250;
+
+	if((xTimerIsTimerActive(testTimer) != pdTRUE) || (testTimer == NULL)){
+		testTimer = xTimerCreate("test motor", (20), pdTRUE, (void *) 6, motorPID);
+		USART_puts(USART3, "ctrl:");
+		USART_putd(USART3, testTimer);
+		USART_puts(USART3, "\r\n");
+		xTimerStart(testTimer, 0);
+	}
+	else{
+		xTimerReset(testTimer, 0);
 	}
 }

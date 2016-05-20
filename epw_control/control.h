@@ -12,6 +12,8 @@
 #include "record.h"
 #include "linear_actuator.h"
 
+#include "PID.h"
+
 typedef enum {
 	CMD_STOP = 115,
 	CMD_FORWARD = 102,
@@ -24,6 +26,7 @@ typedef enum {
 
 void processCMD(uint8_t id, uint8_t value);
 void checkState(void);
+void motorStop(void);
 void test_forward(void);
 void forward(void);
 void test_backward(void);

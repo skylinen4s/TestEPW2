@@ -61,11 +61,13 @@ SRC+=motor.c
 SRC+=encoder.c
 SRC+=linear_actuator.c
 SRC+=sensors.c
+SRC+=clib.c
 #----------------------
 
 # epw control
 SRC+=record.c
 SRC+=control.c
+SRC+=PID.c
 
 # sdio
 SRC+=sdio_debug.c

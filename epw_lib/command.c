@@ -135,6 +135,9 @@ void receive_task(){
 			/* motorTest */
 			motorTest();
 		}
+		else if(received_string[0] == 'S'){
+			motorStop();
+		}
 
 		else{
 			USART_puts(USART3, received_string);
