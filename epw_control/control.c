@@ -292,13 +292,14 @@ void motorTest()
 
 	CMD_State = EPW_IDLE;
 
-	init_PID(&pid_l, 12.0f, 1.0f, 0.0f);
-	init_PID(&pid_r, 12.0f, 1.0f, 0.0f);
-
-	cmd_cnt = 250;
+	cmd_cnt = 270;
 
 	if((xTimerIsTimerActive(testTimer) != pdTRUE) || (testTimer == NULL)){
 		testTimer = xTimerCreate("test motor", (20), pdTRUE, (void *) 6, motorPID);
+
+		init_PID(&pid_l, 12.0f, 0.2f, 0.5f);
+		init_PID(&pid_r, 12.0f, 0.2f, 0.5f);
+
 		USART_puts(USART3, "ctrl:");
 		USART_putd(USART3, testTimer);
 		USART_puts(USART3, "\r\n");
