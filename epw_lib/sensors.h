@@ -20,6 +20,9 @@
 void cCurAll(void);
 void cCurMotor(void);
 void getCurData(void);
+int getCurAll(void);
+int getCurLeft(void);
+int getCurRight(void);
 void init_CurTransducer(void);
 static void init_CurADC(void);
 static void init_CurDMA(void);

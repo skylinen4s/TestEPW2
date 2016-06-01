@@ -217,25 +217,26 @@ static void motortest()
 	cnt[0] = getEncoderLeft();
 	cnt[1] = getEncoderRight();
 
+	int cur[3];
+	cur[0] = getCurAll();
+	cur[1] = getCurLeft();
+	cur[2] = getCurRight();
+
 	cmd_cnt++;
-	if(cmd_cnt == 100 && CMD_State != EPW_STOP){
+	if(cmd_cnt == 400 && CMD_State != EPW_STOP){
 		SpeedValue_left += 12;
 		SpeedValue_right += 12;
 		// increase duty cycle 1% every period
 		mMove(SpeedValue_left, SpeedValue_right);
 
-		USART_puts(USART3, "value:");
-		USART_putd(USART3, SpeedValue_left);
-		USART_puts(USART3, "\r\n");
-
 		cmd_cnt = 0;
 		if(SpeedValue_right > 900){
-			endofRecord();
 			mStop(mBoth);
 			xTimerDelete(ctrlTimer, 0);
+			endofRecord();
 		}
 	}
-	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+	recControlData2(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1], cur[1], cur[2]);
 }
 
 static void motorResp()
@@ -243,6 +244,10 @@ static void motorResp()
 	int cnt[2];
 	cnt[0] = getEncoderLeft();
 	cnt[1] = getEncoderRight();
+
+	int cur[2];
+	cur[0] = getCurLeft();
+	cur[1] = getCurRight();
 
 	cmd_cnt++;
 	if(cmd_cnt >= 500 && CMD_State != EPW_STOP){
@@ -252,7 +257,7 @@ static void motorResp()
 			xTimerDelete(ctrlTimer, 0);
 		}
 	}
-	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+	recControlData2(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1], cur[0], cur[1]);
 }
 
 PID_t pid_l;
@@ -263,6 +268,10 @@ void motorPID(){
 	int cnt[2];
 	cnt[0] = getEncoderLeft();
 	cnt[1] = getEncoderRight();
+
+	int cur[2];
+	cur[0] = getCurLeft();
+	cur[1] = getCurRight();
 
 	if(cmd_cnt && (CMD_State != EPW_STOP)){
 		--cmd_cnt;
@@ -282,7 +291,8 @@ void motorPID(){
 		}
 	}
 
-	recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+	//recControlData(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1]);
+	recControlData2(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1], cur[0], cur[1]);
 }
 
 void motorTest()
@@ -292,7 +302,8 @@ void motorTest()
 
 	CMD_State = EPW_IDLE;
 
-	cmd_cnt = 270;
+	cmd_cnt = 270; //for motorPID
+	//cmd_cnt = 0; // fot motortest
 
 	if((xTimerIsTimerActive(testTimer) != pdTRUE) || (testTimer == NULL)){
 		testTimer = xTimerCreate("test motor", (20), pdTRUE, (void *) 6, motorPID);

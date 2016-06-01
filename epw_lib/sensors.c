@@ -48,6 +48,25 @@ void getCurData(){
 	cCurMotor();
 }
 
+int getCurAll(){
+	float all = (float)CurValue[0];
+	all = 5-2*3*(all/4096);
+	all*=1000;
+	return all;
+}
+
+int getCurLeft(){
+	float left = (float)CurValue[1];
+	left = left*3/4; //Vall = (ADCvalue / 4096)*3(V)*1000(mV)
+	return left;
+}
+
+int getCurRight(){
+	float right = (float)CurValue[2];
+	right = right*3/4;
+	return right;
+}
+
 void init_CurTransducer(){
 	init_CurDMA();
 	init_CurADC();
