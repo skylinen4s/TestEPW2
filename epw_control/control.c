@@ -223,14 +223,14 @@ static void motortest()
 	cur[2] = getCurRight();
 
 	cmd_cnt++;
-	if(cmd_cnt == 400 && CMD_State != EPW_STOP){
+	if(cmd_cnt == 400 || CMD_State == EPW_STOP){
 		SpeedValue_left += 12;
 		SpeedValue_right += 12;
 		// increase duty cycle 1% every period
 		mMove(SpeedValue_left, SpeedValue_right);
 
 		cmd_cnt = 0;
-		if(SpeedValue_right > 900){
+		if(SpeedValue_right > 900 || CMD_State == EPW_STOP){
 			mStop(mBoth);
 			xTimerDelete(testTimer, 0);
 			endofRecord();
@@ -250,11 +250,11 @@ static void motorResp()
 	cur[1] = getCurRight();
 
 	cmd_cnt++;
-	if(cmd_cnt >= 500 && CMD_State != EPW_STOP){
+	if(cmd_cnt >= 500 || CMD_State == EPW_STOP){
 		mStop(mBoth);
 		if(!(cnt[0] || cnt[1])){
-			endofRecord();
 			xTimerDelete(testTimer, 0);
+			endofRecord();
 		}
 	}
 	recControlData2(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1], cur[0], cur[1]);
@@ -297,8 +297,9 @@ void motorPID(){
 
 void motorTest()
 {
-	SpeedValue_left = 600;
-	SpeedValue_right = 600;
+	SpeedValue_left = 800;
+	SpeedValue_right = 800;
+	mMove(SpeedValue_left,SpeedValue_right);
 
 	CMD_State = EPW_IDLE;
 
