@@ -135,7 +135,7 @@ void USART3_IRQHandler(void){
             if(Receive_data=='0') GPIO_ToggleBits(GPIOD,GPIO_Pin_15);
 
             /*start determine the period of command.*/
-            if(received_string[cnt]=='\r'){
+            if(received_string[cnt]=='\r' || received_string[cnt]=='o'){
                 Receive_String_Ready = 1; /*Ready to parse the command */
                 cnt=0; /*restart to accept next stream message.*/
             }
