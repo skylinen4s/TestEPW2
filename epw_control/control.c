@@ -232,7 +232,7 @@ static void motortest()
 		cmd_cnt = 0;
 		if(SpeedValue_right > 900){
 			mStop(mBoth);
-			xTimerDelete(ctrlTimer, 0);
+			xTimerDelete(testTimer, 0);
 			endofRecord();
 		}
 	}
@@ -254,7 +254,7 @@ static void motorResp()
 		mStop(mBoth);
 		if(!(cnt[0] || cnt[1])){
 			endofRecord();
-			xTimerDelete(ctrlTimer, 0);
+			xTimerDelete(testTimer, 0);
 		}
 	}
 	recControlData2(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1], cur[0], cur[1]);
