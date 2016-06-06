@@ -56,14 +56,28 @@ int getCurAll(){
 }
 
 int getCurLeft(){
-	float left = (float)CurValue[1];
-	left = left*3/4; //Vall = (ADCvalue / 4096)*3(V)*1000(mV)
+	int left = CurValue[1];
+	static int last_left = 0;
+
+	/* low-pass filter */
+	left = (left + (last_left << 3) - last_left) >> 3;
+	last_left = left;
+
+	/* Vall = (ADCvalue / 4096)*3(V)*1000(mV) */
+	left = ((left << 2) - left) >> 2;
 	return left;
 }
 
 int getCurRight(){
-	float right = (float)CurValue[2];
-	right = right*3/4;
+	int right = CurValue[2];
+	static int last_right = 0;
+
+	/* low-pass filter */
+	right = (right + (last_right << 3) - last_right) >> 3;
+	last_right = right;
+
+	/* Vall = (ADCvalue / 4096)*3(V)*1000(mV) ~= ADC*3/4 */
+	right = ((right << 2) - right) >> 2;
 	return right;
 }
 
