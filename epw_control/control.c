@@ -337,8 +337,8 @@ void testFNN(){
 
 	if(cmd_cnt && (CMD_State != EPW_STOP)){
 		--cmd_cnt;
-		if(cmd_cnt > 20)fzyNeuCtrl(cnt[0], cnt[1], 15.0f);
-		else if(cmd_cnt < 20)fzyNeuCtrl(cnt[0], cnt[1], 0.0f);
+		if(cmd_cnt > 20)fzyNeuCtrl(cnt[0], cnt[1], 15.0f, 15.0f);
+		else if(cmd_cnt < 20)fzyNeuCtrl(cnt[0], cnt[1], 0.0f, 0.0f);
 
 		if(fnn_l < 0) fnn_l = 0;
 		if(fnn_r < 0) fnn_r = 0;

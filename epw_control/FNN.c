@@ -72,20 +72,21 @@ void initFNN(){
 	P[1] = 0.0f;
 }
 
-void fzyNeuCtrl(int en_l, int en_r, float setpoint){
+void fzyNeuCtrl(int en_l, int en_r, float set_l, float set_r){
 	/* encoder value ----> rotation (rad/s) */
 	float vl, vr;
 	vl = (float)en_l * 0.2586f;
 	vr = (float)en_r * 0.2586f;
-	setpoint = setpoint * 0.2586f;
+	set_l = set_l * 0.2586f;
+	set_r = set_r * 0.2586f;
 
 	/* update x(m) with x(m+1) computed last time */
 	xl = xl_1; 
 	xr = xr_1;
 
 	/* 1.reference model */
-	xl_1 = referModel(xl, setpoint);
-	xr_1 = referModel(xr, setpoint);
+	xl_1 = referModel(xl, set_l);
+	xr_1 = referModel(xr, set_r);
 	
 	/* 2.reference state */
 	referState(xl_1, xr_1, xl, xr);

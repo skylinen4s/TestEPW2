@@ -15,7 +15,7 @@ typedef struct MBF_Struct{
 
 void initMBF(MBF_t *mf, float c, float b);
 void initFNN();
-void fzyNeuCtrl(int en_l, int en_r, float setpoint);
+void fzyNeuCtrl(int en_l, int en_r, float set_l, float set_r);
 float compute_MBF(MBF_t *mf, float err);
 float referModel(float xm, float rm);
 void referState(float v11, float v21, float v1, float v2);
