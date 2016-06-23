@@ -67,9 +67,10 @@ void initFNN(){
 			w2[i][j] = 0.0f;			
 		}
 	}
+*/
 	P[0] = 0.0f;
 	P[1] = 0.0f;
-*/}
+}
 
 void fzyNeuCtrl(int en_l, int en_r, float setpoint){
 	/* encoder value ----> rotation (rad/s) */
@@ -79,7 +80,7 @@ void fzyNeuCtrl(int en_l, int en_r, float setpoint){
 	setpoint = setpoint * 0.2586f;
 
 	/* update x(m) with x(m+1) computed last time */
-	xl = xl_1;
+	xl = xl_1; 
 	xr = xr_1;
 
 	/* 1.reference model */
