@@ -30,7 +30,7 @@ void start_record(){
 
     /* open file to write data */
     res = f_open(&file, "data.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
-    res = f_open(&f_value, "pwm.val", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+    res = f_open(&f_value, "fncp.txt", FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
 
     if(res != FR_OK) printf("open file failed: %d\n\r", res);
 
@@ -74,15 +74,31 @@ void recControlData(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R){
     /* f_sync would spend some much time, making timer delayed and data error */
 }
 
+/* record pwm, enc, cur */
 void recControlData2(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R, int cur_L, int cur_R){
     if(&file){
         res = f_printf(&file, "%d %d %d %d %d %d\r\n", pwm_L, pwm_R, enc_L, enc_R, cur_L, cur_R);
     }
 }
 
+/* record pwm, enc, cur, fnc */
+void recControlData3(uint32_t pwm_L, uint32_t pwm_R, int enc_L, int enc_R, int cur_L, int cur_R, int fnc_l, int fnc_r){
+    if(&file){
+        res = f_printf(&file, "%d %d %d %d %d %d %d %d\r\n", pwm_L, pwm_R, enc_L, enc_R, cur_L, cur_R, fnc_l, fnc_r);
+    }
+}
+
+/* record fnc parameters */
+void recFzyNeuData(int e1, int e2, int f_l, int f_r, int s_l, int s_r, int r_l, int r_r){
+    if(&f_value){
+        res = f_printf(&f_value, "%d %d %d %d %d %d %d %d\r\n",e1, e2, f_l, f_r, s_l, s_r, r_l, r_r);
+    }
+}
+
 /* sync the data after all commands are over */
 void endofRecord(){
     res = f_sync(&file);
+    res = f_sync(&f_value);
 }
 
 void record(){

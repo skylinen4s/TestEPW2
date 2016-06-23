@@ -68,6 +68,7 @@ SRC+=clib.c
 SRC+=record.c
 SRC+=control.c
 SRC+=PID.c
+SRC+=FNN.c
 
 # sdio
 SRC+=sdio_debug.c
