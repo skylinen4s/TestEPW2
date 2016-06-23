@@ -4,7 +4,7 @@
 #define __COMMAND_H__
 #include "stm32f4xx.h"
 
-#define DEBUG_MODE		0
+#define DEBUG_MODE		1
 #define USER_MODE		!DEBUG_MODE
 
 extern uint8_t Receive_String_Ready;

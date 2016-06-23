@@ -297,8 +297,8 @@ void motorPID(){
 
 void motorTest()
 {
-	SpeedValue_left = 800;
-	SpeedValue_right = 800;
+	SpeedValue_left = 600;
+	SpeedValue_right = 600;
 	mMove(SpeedValue_left,SpeedValue_right);
 
 	CMD_State = EPW_IDLE;
@@ -311,6 +311,65 @@ void motorTest()
 
 		init_PID(&pid_l, 12.0f, 0.2f, 0.5f);
 		init_PID(&pid_r, 12.0f, 0.2f, 0.5f);
+
+		USART_puts(USART3, "ctrl:");
+		USART_putd(USART3, testTimer);
+		USART_puts(USART3, "\r\n");
+		xTimerStart(testTimer, 0);
+	}
+	else{
+		xTimerReset(testTimer, 0);
+	}
+}
+
+extern int fnn_l, fnn_r;
+void testFNN(){
+	int cnt[2];
+	cnt[0] = getEncoderLeft();
+	cnt[1] = getEncoderRight();
+
+	int cur[2];
+	cur[0] = getCurLeft();
+	cur[1] = getCurRight();
+
+	fnn_l = 1;
+	fnn_r = 2;
+
+	if(cmd_cnt && (CMD_State != EPW_STOP)){
+		--cmd_cnt;
+		if(cmd_cnt > 20)fzyNeuCtrl(cnt[0], cnt[1], 15.0f);
+		else if(cmd_cnt < 20)fzyNeuCtrl(cnt[0], cnt[1], 0.0f);
+
+		if(fnn_l < 0) fnn_l = 0;
+		if(fnn_r < 0) fnn_r = 0;
+
+		SpeedValue_left = 600 + fnn_l;
+		SpeedValue_right = 600 + fnn_r;
+		mMove(SpeedValue_left,SpeedValue_right);
+	}
+	else{
+		mStop(mBoth);
+		//CMD_State = EPW_STOP;
+		if(!(cnt[0] || cnt[1])){
+			xTimerDelete(testTimer, 0);
+			USART_puts(USART3, "delete\r\n");
+			endofRecord();
+		}
+	}
+
+	recControlData3(SpeedValue_left, SpeedValue_right, cnt[0], cnt[1], cur[0], cur[1],fnn_l, fnn_r);
+}
+
+void motorFNN(){
+	initFNN();
+
+	SpeedValue_left = 600;
+	SpeedValue_right = 600;
+
+	cmd_cnt = 270;
+
+	if((xTimerIsTimerActive(testTimer) != pdTRUE) || (testTimer == NULL)){
+		testTimer = xTimerCreate("test motor", (20), pdTRUE, (void *) 6, testFNN);
 
 		USART_puts(USART3, "ctrl:");
 		USART_putd(USART3, testTimer);

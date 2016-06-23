@@ -9,6 +9,7 @@
 #include "sensors.h"
 /*parse*/
 #include "string.h"
+#include "clib.h"
 
 extern uint32_t SpeedValue_left;
 extern uint32_t SpeedValue_right;
@@ -110,10 +111,10 @@ void receive_task(){
 		else if(received_string[0] == 'c'){
 			getCurData();
 		}
-		else if(received_string[0] == 's'){
+		//else if(received_string[0] == 's'){
 			/* stop */
-			processCMD('s', '0');
-		}
+		//	processCMD('s', '0');
+		//}
 		else if(received_string[0] == 'f'){
 			/* forward */
 			processCMD('f', '0');
@@ -133,10 +134,14 @@ void receive_task(){
 
 		else if(received_string[0] == 'm'){
 			/* motorTest */
-			motorTest();
+			//motorTest();
+			motorFNN();
 		}
-		else if(received_string[0] == 'S'){
+		else if(received_string[0] == 's'){
 			motorStop();
+		}
+		else if(received_string[0] == 'r'){
+			endofRecord();
 		}
 
 		else{

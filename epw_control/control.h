@@ -13,6 +13,7 @@
 #include "linear_actuator.h"
 
 #include "PID.h"
+#include "FNN.h"
 
 typedef enum {
 	CMD_STOP = 115,
