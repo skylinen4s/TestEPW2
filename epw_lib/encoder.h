@@ -63,6 +63,8 @@ State_t getState(Encoder_t* encoder_L, Encoder_t* encoder_R);
 State_t getEPWState(void);
 int getEncoderLeft(void);
 int getEncoderRight(void);
+int getEncoderLeftSign(void);
+int getEncoderRightSign(void);
 void getEncoder(void);
 
 #endif /* __ENCODER_H__ */

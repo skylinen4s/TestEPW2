@@ -166,6 +166,30 @@ int getEncoderRight(){
 	return right_cnt;
 }
 
+
+/* value with sign(+ or -), forward: +, backward: - */
+/* get left encoder count value */
+int getEncoderLeftSign(){
+/* For left 	forward: 2(CCW), backward: 1(CW) */
+	detachEXTI(EXTI_Line0 | EXTI_Line2);
+	int left_cnt = ENCODER_L.count;
+	if(ENCODER_L.rotate == CW) left_cnt = 0 - left_cnt;
+	ENCODER_L.count = 0;
+	attachEXTI(EXTI_Line0 | EXTI_Line2);
+	return left_cnt;
+}
+
+/* get right encoder count value */
+int getEncoderRightSign(){
+/* For right	forward: 1(CW), backward: 2(CCW) */
+	detachEXTI(EXTI_Line1 | EXTI_Line3);
+	int right_cnt = ENCODER_R.count;
+	if(ENCODER_R.rotate == CCW) right_cnt = 0 - right_cnt;
+	ENCODER_R.count = 0;
+	attachEXTI(EXTI_Line1 | EXTI_Line3);
+	return right_cnt;
+}
+
 /* test use for printing the status and counter value through usart */
 void getEncoder(void){
 	detachEXTI(EXTI_Line0 | EXTI_Line1 | EXTI_Line2 | EXTI_Line3);
