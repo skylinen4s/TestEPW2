@@ -1,31 +1,48 @@
 #include "FNN.h"
 #include "record.h"
 
-/* model of the wheelchair */
+/* model1 of the wheelchair */
 float Ap[2][2] = {{-0.105f, 0.0532f}, {0.047f, -0.1027}};
 float Bp[2][2] = {{0.3701f, -0.1712f}, {-0.1481f, 0.3170f}};
 float Bi[2][2] = {{4.403f, 2.378f}, {2.057f, 4.265f}};
 /* Bi is the inverse matrix of Bp */
 
+/* gain of yt for real ctrl signal */
+float k_lf = 5.1787f, lf = 39.133f;
+float k_rf = 4.8069f, rf = 29.036f;
+float k_lb = 11.912f, lb = -116.71f;
+float k_rb = 11.674f, rb = -135.44f;
+
+
+/* model2 of the wheelchair */
+//float Ap[2][2] = {{-0.1235f, 0.0735f}, {0.0756f, -0.1034}};
+//float Bp[2][2] = {{0.1707f, -0.0349f}, {-0.0599f, 0.1164f}};
+//float Bi[2][2] = {{6.5471f, 1.963f}, {3.3691f, 9.6012f}};
+
+//float k_lf = 3.113f, lf = 48.44f + 6.0f;
+//float k_rf = 2.1178f, rf = 36.858f;
+//float k_lb = 7.4343f, lb = -120.44f;
+//float k_rb = 5.4121f, rb = -136.22f;
+
+
 float st = 0.02f; /* sampling time(s) */ 
 
 /* init Weight (random) */
-float w1[3][3] = {{0.0f, 0.0f, 0.0f} \
-				 ,{0.0f, 0.0f, 0.0f} \
-				 ,{0.0f, 0.0f, 0.0f}};
+float w1[3][3] = {{0.2f, 0.2f, 0.2f} \
+				 ,{0.2f, 0.2f, 0.2f} \
+				 ,{0.2f, 0.2f, 0.2f}};
 
-float w2[3][3] = {{0.0f, 0.0f, 0.0f} \
-				 ,{0.0f, 0.0f, 0.0f} \
-				 ,{0.0f, 0.0f, 0.0f}};
+float w2[3][3] = {{0.2f, 0.2f, 0.2f} \
+				 ,{0.2f, 0.2f, 0.2f} \
+				 ,{0.2f, 0.2f, 0.2f}};
 
 
 /* init switching ctrl value (random)*/
-float P[2] = {0.0f, 0.0f};
+float P[2] = {0.5f, 0.5f};
 
 /* output sets 
  * yt = yfnc + yr + ys
  * 0: left , 1: right */
-float k = 5.1f;/* gain of yt for real ctrl signal */
 float yt[2];
 float yfnc[2];
 float yr[2];
@@ -60,14 +77,16 @@ void initFNN(){
 	xl_1 = 0.0f;
 	xr_1 = 0.0f;
 
-/*	int i,j;
+	/* initial value of W */
+	int i,j;
 	for(i=0; i<num; i++){
 		for(j=0; j<num; j++){
-			w1[i][j] = 0.0f;
-			w2[i][j] = 0.0f;			
+			w1[i][j] = 0.2f;
+			w2[i][j] = 0.2f;
 		}
 	}
-*/
+
+	/* initial value of switching control */
 	P[0] = 0.0f;
 	P[1] = 0.0f;
 }
@@ -101,13 +120,21 @@ void fzyNeuCtrl(int en_l, int en_r, float set_l, float set_r){
 
 	/* 5.switching control */
 	switching(e1, e2);
+	//ys[0] = 0;
+	//ys[1] = 0;
 
 	/* 6.control signal */
 	yt[0] = yfnc[0] + ys[0] + yr[0];
 	yt[1] = yfnc[1] + ys[1] + yr[1];
 
-	fnn_l = math_round(k*yt[0]);
-	fnn_r = math_round(k*yt[1]);
+	/* control signal mapping */
+	if(yt[0] > 0) fnn_l = math_round(k_lf * yt[0] + lf);
+	else if(yt[0] == 0) fnn_l = 0.0f;
+	else if(yt[0] < 0) fnn_l = math_round(k_lb  * yt[0] + lb);
+
+	if(yt[1] > 0) fnn_r = math_round(k_rf * yt[1] + rf);
+	else if(yt[1] == 0) fnn_r = 0.0f;
+	else if(yt[1] < 0) fnn_r = math_round(k_rb * yt[1] + rb);
 
 	recFzyNeuData((int)(e1*10000), (int)(e2*10000), (int)(yfnc[0]*10000), (int)(yfnc[1]*10000), (int)(ys[0]*10000), (int)(ys[1]*10000), (int)(yr[0]*10000), (int)(yr[1]*10000));
 }
@@ -123,8 +150,8 @@ float compute_MBF(MBF_t *mf, float err){
 /* X(m+1) = a*X(m) + b*r(m) */
 float referModel(float xm, float rm){
 	float xm_1, a, b;
-	a = 0.5f;
-	b = 0.5f;
+	a = 0.9f;
+	b = 0.1f;
 	xm_1 = a * xm + b * rm;
 
 	return xm_1;
@@ -152,6 +179,10 @@ void switching(float e1, float e2){
 
 	P[0] = P[0] + f_abs(dp[0]) * st;
 	P[1] = P[1] + f_abs(dp[1]) * st;
+
+	/* limit of value */
+	if(P[0] >= 5) P[0] = 5.0f;
+	if(P[1] >= 5) P[1] = 5.0f;
 
 	ys[0] = f_sign(dp[0])*P[0];
 	ys[1] = f_sign(dp[1])*P[1];

@@ -12,6 +12,7 @@
 #include "record.h"
 #include "linear_actuator.h"
 
+#include "clib.h"
 #include "PID.h"
 #include "FNN.h"
 
